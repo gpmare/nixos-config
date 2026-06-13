@@ -27,6 +27,9 @@
     eza                  # `eza` — `ls` with colors, icons, git status
     fzf                  # fuzzy finder; great with Ctrl+R shell history
 
+    # ----- Build tools -----
+    gnumake              # `make` — runs targets defined in Makefile
+
     # ----- Language runtimes (broad starter set) -----
     nodejs_22            # JavaScript / TypeScript projects
     python313            # Python projects + scripts
