@@ -6,6 +6,8 @@
 
 { config, pkgs, username, ... }:
 
+
+
 {
   # ============================================================
   #  Identity
@@ -27,9 +29,16 @@
   # ============================================================
   programs.git = {
     enable = true;
-    settings.user = {
-      name  = "Gerhard";                # TODO: set to your GitHub username
-      email = "gpmare0@gmail.com";
+    settings = {
+      user = {
+        name  = "Gerhard";              # TODO: set to your GitHub username
+        email = "gpmare0@gmail.com";
+      };
+      # Use gh as git's credential helper so `git push` to GitHub
+      # works without prompting. `!` tells git "run this as a shell
+      # command" — gh's `auth git-credential` reads the stored OAuth
+      # token from the keyring.
+      credential.helper = "!${pkgs.gh}/bin/gh auth git-credential";
     };
   };
 }
