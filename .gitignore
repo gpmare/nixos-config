@@ -1,0 +1,14 @@
+# Build outputs from `nixos-rebuild build` / `nix build`
+result
+result-*
+
+# direnv local state
+.direnv/
+
+# Editor scratch
+*.swp
+*.swo
+.vscode/
+
+# OS
+.DS_Store
