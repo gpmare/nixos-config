@@ -14,6 +14,12 @@
     enable  = true;
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;
 
+    # Hyprland 0.55 + home.stateVersion "26.05" defaults this to "lua",
+    # which can't represent the classic "$mod"/"exec-once" style below
+    # (invalid Lua → "emergency mode", no keybinds). Pin the classic
+    # format so the settings below generate hyprland.conf as written.
+    configType = "hyprlang";
+
     settings = {
       # Variables — referenced below in keybinds.
       "$mod"     = "SUPER";
