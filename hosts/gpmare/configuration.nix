@@ -12,6 +12,7 @@
 
     ../../modules/system.nix
     ../../modules/desktop.nix
+    ../../modules/hyprland.nix
     ../../modules/audio.nix
     ../../modules/dev.nix
     ../../modules/packages.nix

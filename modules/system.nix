@@ -51,4 +51,12 @@
   #  Allow unfree packages (VSCode, Reaper, Brave, etc.)
   # ============================================================
   nixpkgs.config.allowUnfree = true;
+
+  # ============================================================
+  #  Fonts — system-wide so every app (waybar, kitty, Plasma, …)
+  #  can render glyph icons.
+  # ============================================================
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
 }

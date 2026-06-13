@@ -1,14 +1,18 @@
 # User-level config managed by home-manager.
 # This file is a FUNCTION called by flake.nix with the args below.
-#
-# Keep this minimal for now; we'll grow it when adding Hyprland,
-# a shell config, editor configs, etc.
+# Per-feature user configs (Hyprland, etc.) live in sibling files
+# and are pulled in via `imports`.
 
 { config, pkgs, username, ... }:
 
-
-
 {
+  # ============================================================
+  #  Sub-modules: each file declares part of the user-level setup.
+  # ============================================================
+  imports = [
+    ./hyprland.nix
+  ];
+
   # ============================================================
   #  Identity
   # ============================================================
