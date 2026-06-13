@@ -26,8 +26,10 @@
   #  Git identity (so commits are attributed correctly)
   # ============================================================
   programs.git = {
-    enable    = true;
-    userName  = "Gerhard";              # TODO: set to your GitHub username
-    userEmail = "gpmare0@gmail.com";
+    enable = true;
+    settings.user = {
+      name  = "Gerhard";                # TODO: set to your GitHub username
+      email = "gpmare0@gmail.com";
+    };
   };
 }
