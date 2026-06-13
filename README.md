@@ -41,4 +41,11 @@ Makefile                               make switch / update / clean
    (or generate one: `nixos-generate-config --show-hardware-config`).
 4. Adjust `boot.initrd.luks.devices` UUID in
    `hosts/gpmare/configuration.nix` to match the new disk.
-5. `sudo nixos-rebuild switch --flake .#gpmare`
+5. First rebuild — pass `experimental-features` via `--option` since
+   the system doesn't have flakes enabled yet:
+   ```
+   sudo nixos-rebuild switch --flake .#gpmare \
+     --option experimental-features "nix-command flakes"
+   ```
+6. From then on, just `make switch` — the system config has flakes
+   on, so the bare `nixos-rebuild` works.
