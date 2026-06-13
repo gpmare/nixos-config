@@ -18,9 +18,11 @@
   # ============================================================
   #  Networking
   # ============================================================
+  # NetworkManager handles wpa_supplicant internally; we don't need
+  # to touch `networking.wireless.enable` (and on nixpkgs-unstable
+  # the networkmanager module sets it itself, so explicitly setting
+  # it here conflicts).
   networking.networkmanager.enable = true;
-  # Off so it doesn't fight NetworkManager over wpa_supplicant.
-  networking.wireless.enable = false;
 
   # ============================================================
   #  Locale + time zone
