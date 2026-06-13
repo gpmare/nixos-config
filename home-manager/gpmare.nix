@@ -11,6 +11,7 @@
   # ============================================================
   imports = [
     ./hyprland.nix
+    ./vscode.nix
   ];
 
   # ============================================================
@@ -27,6 +28,17 @@
   #  Home-manager itself
   # ============================================================
   programs.home-manager.enable = true;
+
+  # ============================================================
+  #  Shell — bash + handy aliases
+  # ============================================================
+  programs.bash = {
+    enable = true;
+    shellAliases = {
+      conf    = "code ~/nixos-config";                              # open the config repo
+      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#gpmare";  # apply changes
+    };
+  };
 
   # ============================================================
   #  Git identity (so commits are attributed correctly)

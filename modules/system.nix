@@ -56,7 +56,19 @@
   #  Fonts — system-wide so every app (waybar, kitty, Plasma, …)
   #  can render glyph icons.
   # ============================================================
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-  ];
+  fonts = {
+    packages = with pkgs; [
+      nerd-fonts.jetbrains-mono   # monospace + the glyph icons waybar/kitty use
+      noto-fonts                  # wide multilingual coverage
+      noto-fonts-color-emoji      # colour emoji 🎸
+      font-awesome                # extra UI icons
+      corefonts                   # MS fonts (Arial / Times New Roman / …) for web + docs
+    ];
+    # Tell apps which font to reach for by default per category.
+    fontconfig.defaultFonts = {
+      monospace = [ "JetBrainsMono Nerd Font" ];
+      sansSerif = [ "Noto Sans" ];
+      emoji     = [ "Noto Color Emoji" ];
+    };
+  };
 }

@@ -12,7 +12,8 @@
 
   environment.systemPackages = with pkgs; [
     # ----- Editors -----
-    vscode               # Familiar GUI editor (Windows VSCode transplant)
+    # VS Code is managed declaratively (editor + extensions + settings)
+    # in home-manager/vscode.nix, so it's intentionally NOT listed here.
     neovim               # Modal terminal editor; try when curious
 
     # ----- Git / GitHub -----

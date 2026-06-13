@@ -62,6 +62,11 @@
           {
             home-manager.useGlobalPkgs   = true;
             home-manager.useUserPackages = true;
+            # If HM would overwrite a file it didn't create, rename the old
+            # one to <file>.hm-bak instead of aborting. Prevents the
+            # "Existing file ... would be clobbered" activation error when
+            # an app (e.g. VS Code) wrote its own config before HM took over.
+            home-manager.backupFileExtension = "hm-bak";
             home-manager.extraSpecialArgs = { inherit inputs username; };
             home-manager.users.${username} =
               import ./home-manager/${username}.nix;
