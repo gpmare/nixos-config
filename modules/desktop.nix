@@ -18,4 +18,13 @@
   # ============================================================
   services.displayManager.sddm.enable    = true;
   services.desktopManager.plasma6.enable = true;
+
+  # ============================================================
+  #  Wayland (modern display protocol — replaces X11).
+  #  "plasma" = the Wayland session; "plasmax11" = the X11 session.
+  #  Both are still selectable at the SDDM login screen if you ever
+  #  need to fall back.
+  # ============================================================
+  services.displayManager.defaultSession = "plasma";
+  services.displayManager.sddm.wayland.enable = true;
 }
