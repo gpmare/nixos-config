@@ -37,6 +37,7 @@
     shellAliases = {
       conf    = "code ~/nixos-config";                              # open the config repo
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#gpmare";  # apply changes
+      open = "xdg-open"; # open a file or URL in the default app
     };
   };
 

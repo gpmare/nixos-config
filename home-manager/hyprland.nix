@@ -41,14 +41,10 @@
 
       # Programs to start when the Hyprland session starts.
       exec-once = [
+        "hyprpaper"
         "waybar"
         "mako"
-        # Night mode: warms the screen colour after local sunset and
-        # cools it back at sunrise — KDE called this "Night Color".
-        # -l/-L = latitude/longitude (used to compute your sunset),
-        # -t/-T = night/day colour temperature in Kelvin (lower = warmer).
-        # TODO: set -l/-L to YOUR city. Shown: Johannesburg (-26.2, 28.0).
-        "wlsunset -l -26.2 -L 28.0 -t 3700 -T 6500"
+        "hyprsunset -t 3700 -T 6500 --latitude -33.9 --longitude 18.4"
       ];
 
       input = {
@@ -122,15 +118,12 @@
         '', Print, exec, grim -g "$(slurp)" - | wl-copy''
 
         # Monitor brightness over DDC/CI. `ddcutil detect` found the LG on
-        # i2c bus 5. Your Dell ignores these until you switch DDC/CI ON in
-        # its on-screen menu — then add the same lines with --bus 14.
-        # (If a bind stops working later, re-run `ddcutil detect`: bus
-        # numbers can shift when hardware/cables change.)
-        "$mod, F12, exec, ddcutil --bus 5 setvcp 10 + 10"   # brighter
-        "$mod, F11, exec, ddcutil --bus 5 setvcp 10 - 10"   # dimmer
+        # i2c bus 5, and the Dell on i2c bus 14.
+        "$mod, F12, exec, ddcutil --bus 5 setvcp 10 + 10 && ddcutil --bus 14 setvcp 10 + 10"   # brighter
+        "$mod, F11, exec, ddcutil --bus 5 setvcp 10 - 10 && ddcutil --bus 14 setvcp 10 - 10"   # dimmer
         # These fire too, if your keyboard has dedicated brightness keys:
-        ", XF86MonBrightnessUp,   exec, ddcutil --bus 5 setvcp 10 + 10"
-        ", XF86MonBrightnessDown, exec, ddcutil --bus 5 setvcp 10 - 10"
+        ", XF86MonBrightnessUp,   exec, ddcutil --bus 5 setvcp 10 + 10 && ddcutil --bus 14 setvcp 10 + 10"
+        ", XF86MonBrightnessDown, exec, ddcutil --bus 5 setvcp 10 - 10 && ddcutil --bus 14 setvcp 10 - 10"
       ];
 
       # Mouse bindings: hold $mod + drag.
@@ -169,25 +162,23 @@
       position       = "top";
       height         = 32;
       # Francois-style layout: clock + workspaces on the left, focused-window
-      # title in the centre, stats + media on the right. (His battery,
-      # backlight, mongodb, vpn and swaync modules are dropped — they don't
-      # apply to your desktop / tools.)
+      # title in the centre, stats + media on the right.
       modules-left   = [ "clock" "hyprland/workspaces" ];
       modules-center = [ "hyprland/window" ];
-      modules-right  = [ "mpris" "cpu" "memory" "temperature" "network" "pulseaudio" "tray" ];
+      modules-right  = [ "mpris" "cpu" "temperature" "custom/gpu" "memory" "network" "pulseaudio" "tray" ];
 
       # Title of the focused window, shown on the left.
       "hyprland/window" = {
         max-length       = 50;
-        separate-outputs = true;   # show per-monitor, not a global title
+        separate-outputs = true;
       };
 
       clock = {
-        format         = "{:%a %d %b  %H:%M}";   # e.g. "Sat 14 Jun  21:04"
+        format         = "{:%a %d %b  %H:%M}";
         tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
       };
 
-      # Now-playing media — click to play/pause. Uses playerctl (added below).
+      # Now-playing media — click to play/pause.
       mpris = {
         format        = "{player_icon} {dynamic}";
         format-paused = "{status_icon} {dynamic}";
@@ -197,21 +188,25 @@
         on-click      = "playerctl play-pause";
       };
 
-      # System stats. {usage}/{percentage}/{temperatureC} are placeholders
-      # Waybar fills in live. Swap the text labels for Nerd Font glyphs later.
-      cpu    = { format = "CPU {usage}%";      interval = 2; };
-      memory = { format = "RAM {percentage}%"; interval = 5; };
+      # System stats.
+      cpu = { format = "CPU {usage}%"; interval = 2; };
       temperature = {
-        format             = "{temperatureC}°C";
-        critical-threshold = 80;   # adds a "critical" CSS class above this
+        format = "({temperatureC}°C)";
+        critical-threshold = 80;
       };
+      "custom/gpu" = {
+        exec = "cat /sys/class/drm/card1/device/gpu_busy_percent";
+        format = "GPU {}%";
+        interval = 2;
+      };
+      memory = { format = "RAM {percentage}%"; interval = 5; };
 
       network = {
         format-wifi         = "{essid} ({signalStrength}%)";
         format-ethernet     = "wired";
         format-disconnected = "offline";
         tooltip-format      = "{ifname}: {ipaddr}";
-        on-click            = "kitty -e nmtui";   # click to manage connections
+        on-click            = "kitty -e nmtui";
       };
 
       tray = { spacing = 8; };
@@ -223,13 +218,13 @@
 
       pulseaudio = {
         format       = "{volume}% {icon}";
-        format-icons = [ "" "" "" ];
+        format-muted = "{volume}% ";
+        format-icons = [ "" "" "" ];
         on-click     = "pavucontrol";
       };
     };
 
-    # Francois's structure (pill-grouped modules, gradient active workspace,
-    # hover highlights) rendered in your BR2049 orange instead of Catppuccin.
+    # Francois's structure rendered in BR2049 orange.
     style = ''
       * {
         font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free";
@@ -245,8 +240,8 @@
       }
 
       /* Each module sits in its own rounded "pill". */
-      #clock, #workspaces, #window, #mpris, #cpu, #memory,
-      #temperature, #network, #pulseaudio, #tray {
+      #clock, #workspaces, #window, #mpris, #cpu, #temperature, #custom-gpu, #memory,
+      #network, #pulseaudio, #tray {
         margin: 4px 3px;
         padding: 2px 10px;
         border-radius: 8px;
@@ -254,6 +249,20 @@
       }
 
       #clock { color: #ff8533; font-weight: bold; }
+
+      /* Merge CPU and Temperature into one visual box. */
+      #cpu {
+        margin-right: 0;
+        padding-right: 4px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      #temperature {
+        margin-left: 0;
+        padding-left: 4px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
 
       /* Workspaces: the active one gets the orange gradient. */
       #workspaces { padding: 2px 4px; }
@@ -275,8 +284,8 @@
 
       #window { color: #cccccc; }
 
-      /* Stats: warm orange; temperature turns red past the critical threshold. */
-      #cpu, #memory, #temperature { color: #ff8533; }
+      /* Stats: warm orange. */
+      #cpu, #temperature, #custom-gpu, #memory { color: #ff8533; }
       #temperature.critical { color: #ff4444; }
 
       #mpris { color: #ffb380; }
@@ -285,7 +294,7 @@
       #pulseaudio { color: #ffcc99; }
       #pulseaudio.muted { color: #777777; }
 
-      /* Subtle lift when hovering the clickable modules. */
+      /* Subtle lift when hovering. */
       #network:hover, #pulseaudio:hover, #clock:hover {
         background: rgba(255, 107, 0, 0.2);
       }
@@ -298,15 +307,31 @@
   services.mako.enable = true;
 
   # ============================================================
+  #  Wallpaper
+  # ============================================================
+   services.hyprpaper = {
+      enable = true;
+      settings = {
+        preload   = [ "/home/gpmare/Pictures/Bladerunner2049.png" ];
+        # The part before the comma is the monitor; empty = all monitors.
+        wallpaper = [
+           "DP-3,/home/gpmare/Pictures/Bladerunner2049.png"
+           "HDMI-A-1,/home/gpmare/Pictures/Bladerunner2049.png"
+        ];
+      };
+    };
+
+  # ============================================================
   #  Hyprland-adjacent CLI utilities
   # ============================================================
   home.packages = with pkgs; [
+    hyprpaper
     grim          # take screenshots
     slurp         # interactively pick a region (pairs with grim)
     wl-clipboard  # `wl-copy` / `wl-paste` — Wayland clipboard CLI
     brightnessctl # control screen brightness (laptop)
     pamixer       # control volume from keyboard / scripts
-    wlsunset      # night-mode / blue-light filter (see exec-once above)
+    hyprsunset      # night-mode / blue-light filter (see exec-once above)
     ddcutil       # set external-monitor brightness over DDC/CI (see modules/hyprland.nix)
     playerctl     # media play/pause control (the waybar mpris module uses it)
   ];

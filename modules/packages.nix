@@ -8,9 +8,13 @@
     # ----- General desktop -----
     vim
     brave
+    microsoft-edge
     claude-code
+    gemini-cli
     wget
     obsidian
+    libreoffice
+    freecad
     vlc                  # Universal audio/video player
     # TODO: voice-typing à la Handy. Nothing in nixpkgs gives the
     # one-line install; revisit as a follow-up (whisper-cpp + hotkey).

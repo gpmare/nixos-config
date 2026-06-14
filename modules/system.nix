@@ -63,6 +63,7 @@
       noto-fonts-color-emoji      # colour emoji 🎸
       font-awesome                # extra UI icons
       corefonts                   # MS fonts (Arial / Times New Roman / …) for web + docs
+      vista-fonts                  # MS fonts (Calibri / Cambria / …) for web + docs
     ];
     # Tell apps which font to reach for by default per category.
     fontconfig.defaultFonts = {
