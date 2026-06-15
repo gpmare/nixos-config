@@ -48,6 +48,19 @@
   services.openssh.enable = true;
 
   # ============================================================
+  #  Power management — prevent idle suspend so long-running
+  #  sessions (Claude, builds) aren't killed overnight.
+  #  The screen may still turn off (fine); the PC will not sleep.
+  #  If you ever add hypridle, make sure it doesn't call
+  #  `systemctl suspend` either, or this won't be enough on its own.
+  # ============================================================
+  services.logind.settings.Login = {
+    IdleAction = "ignore";
+    HandleSuspendKey = "ignore";
+    HandleHibernateKey = "ignore";
+  };
+
+  # ============================================================
   #  Allow unfree packages (VSCode, Reaper, Brave, etc.)
   # ============================================================
   nixpkgs.config.allowUnfree = true;

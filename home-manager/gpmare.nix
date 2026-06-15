@@ -11,6 +11,7 @@
   # ============================================================
   imports = [
     ./hyprland.nix
+    ./neovim.nix
     ./vscode.nix
   ];
 
@@ -34,10 +35,56 @@
   # ============================================================
   programs.bash = {
     enable = true;
+    sessionVariables = {
+      PATH = "$HOME/.local/bin:$PATH";
+    };
     shellAliases = {
       conf    = "code ~/nixos-config";                              # open the config repo
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#gpmare";  # apply changes
       open = "xdg-open"; # open a file or URL in the default app
+    };
+  };
+
+  # ============================================================
+  #  Prompt — Starship
+  # ============================================================
+  # Two-line prompt: directory + git info on line 1, orange ❯ on line 2.
+  # No username or hostname — you know who you are.
+  programs.starship = {
+    enable                = true;
+    enableBashIntegration = true;
+    settings = {
+      format = "$directory$git_branch$git_status$cmd_duration\n$character";
+      add_newline = true;
+
+      character = {
+        success_symbol = "[❯](bold #ff6b00)";
+        error_symbol   = "[❯](bold #cc4444)";  # turns red on non-zero exit
+      };
+
+      directory = {
+        style             = "#e0c0a0";
+        truncation_length = 3;
+        truncate_to_repo  = false;
+        format            = "[$path]($style) ";
+      };
+
+      git_branch = {
+        symbol = " ";   # nerd font git icon
+        style  = "#ff8533";
+        format = "[$symbol$branch]($style) ";
+      };
+
+      git_status = {
+        style  = "#d4a040";
+        format = "[$all_status$ahead_behind]($style) ";
+      };
+
+      cmd_duration = {
+        min_time          = 2000;   # only show if command took > 2 s
+        style             = "#808080";
+        format            = "[$duration]($style) ";
+      };
     };
   };
 

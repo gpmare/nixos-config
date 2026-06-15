@@ -4,6 +4,10 @@
 { config, lib, pkgs, ... }:
 
 {
+  # Allows dynamically-linked binaries built for generic Linux to run on NixOS.
+  # Required for VSCode extensions that ship pre-compiled binaries (e.g. Claude Code).
+  programs.nix-ld.enable = true;
+
   # ============================================================
   #  direnv: auto-loads per-project devshells when you `cd` in.
   #  Pair with a .envrc file in each project (we'll cover later).
@@ -12,9 +16,9 @@
 
   environment.systemPackages = with pkgs; [
     # ----- Editors -----
-    # VS Code is managed declaratively (editor + extensions + settings)
-    # in home-manager/vscode.nix, so it's intentionally NOT listed here.
-    neovim               # Modal terminal editor; try when curious
+    # VS Code is managed declaratively in home-manager/vscode.nix.
+    # Neovim is managed declaratively in home-manager/neovim.nix.
+    # Neither belongs here.
 
     # ----- Git / GitHub -----
     git
@@ -30,6 +34,7 @@
 
     # ----- Build tools -----
     gnumake              # `make` — runs targets defined in Makefile
+    uv                   # Fast Python package manager; used by Serena MCP
 
     # ----- Language runtimes (broad starter set) -----
     nodejs_22            # JavaScript / TypeScript projects
