@@ -33,6 +33,23 @@
   # ============================================================
   #  Shell — bash + handy aliases
   # ============================================================
+  # ============================================================
+  #  mise — polyglot runtime manager (node, bun, python, etc.)
+  #  Shell integration adds mise's shims dir to PATH and re-exports
+  #  tool env vars on every new shell.
+  # ============================================================
+  programs.mise = {
+    enable = true;
+    enableBashIntegration = true;
+  };
+
+  # Force mise to install pre-built Node instead of compiling from source.
+  # On NixOS the source build fails; the prebuilt binary runs via nix-ld
+  # (see modules/dev.nix nix-ld.libraries).
+  home.sessionVariables = {
+    MISE_NODE_COMPILE = "0";
+  };
+
   programs.bash = {
     enable = true;
     sessionVariables = {
