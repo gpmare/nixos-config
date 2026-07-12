@@ -27,4 +27,16 @@
   # ============================================================
   services.displayManager.defaultSession = "plasma";
   services.displayManager.sddm.wayland.enable = true;
+
+  # ============================================================
+  #  External-monitor brightness (DDC/CI)
+  # ============================================================
+  # Desktop monitors have no OS-dimmable backlight; they accept
+  # brightness commands over the video cable via DDC/CI. KDE's
+  # brightness slider (Powerdevil) drives this, but it needs the i2c
+  # kernel interface enabled and the user in the "i2c" group (see
+  # extraGroups in hosts/gpmare/configuration.nix). DDC/CI must also be
+  # turned on in each monitor's on-screen menu; run `ddcutil detect`
+  # to confirm both screens are seen.
+  hardware.i2c.enable = true;
 }

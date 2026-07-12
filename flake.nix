@@ -26,10 +26,6 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # Hyprland: tiling Wayland compositor. Pin to the upstream flake
-    # for newer features than nixpkgs ships.
-    hyprland.url = "github:hyprwm/Hyprland";
   };
 
   # ============================================================

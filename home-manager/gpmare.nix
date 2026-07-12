@@ -10,7 +10,6 @@
   #  Sub-modules: each file declares part of the user-level setup.
   # ============================================================
   imports = [
-    ./hyprland.nix
     ./neovim.nix
     ./vscode.nix
   ];

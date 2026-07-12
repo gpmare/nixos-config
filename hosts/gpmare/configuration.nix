@@ -12,7 +12,6 @@
 
     ../../modules/system.nix
     ../../modules/desktop.nix
-    ../../modules/hyprland.nix
     ../../modules/thunar.nix
     ../../modules/audio.nix
     ../../modules/dev.nix
@@ -37,9 +36,9 @@
     isNormalUser = true;
     description  = "Gerhard";
     # "audio" enables realtime priority via PAM (needed by musnix).
-    # "i2c" lets you set external-monitor brightness via ddcutil without
-    # root (see modules/hyprland.nix). Group membership only takes effect
-    # after a full logout/reboot.
+    # "i2c" lets KDE set external-monitor brightness over DDC/CI without
+    # root (see hardware.i2c.enable in modules/desktop.nix). Group
+    # membership only takes effect after a full logout/reboot.
     extraGroups = [ "networkmanager" "wheel" "audio" "i2c" ];
     packages = with pkgs; [
       kdePackages.kate
