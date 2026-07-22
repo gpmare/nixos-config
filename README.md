@@ -12,13 +12,18 @@ hosts/gpmare/
   configuration.nix                    entry point for this host
   hardware-configuration.nix           machine-specific (auto-generated)
 modules/
-  system.nix                           boot, network, locale, ssh, nix
-  desktop.nix                          X11 + KDE Plasma 6 + SDDM
+  system.nix                           boot, network, locale, ssh, nix, fonts
+  desktop.nix                          KDE Plasma 6 + SDDM + KRDP
   audio.nix                            PipeWire + musnix realtime audio
-  dev.nix                              editors + git + CLI tools
-  packages.nix                         general + music apps
+  dev.nix                              git + CLI tools + language runtimes
+  packages.nix                         desktop + music apps
 home-manager/
-  gpmare.nix                           user-level config
+  gpmare.nix                           user-level entry (imports siblings)
+  kitty.nix                            terminal look + Plasma default
+  web-apps.nix                         Google Calendar desktop entry
+  agent-instructions.md                shared Claude/Grok global rules
+  brightness.nix                       Plasma DDC/CI brightness fix
+  neovim.nix / vscode.nix              editors
 Makefile                               make switch / update / clean
 ```
 

@@ -13,7 +13,20 @@
   # ============================================================
   #  Nix daemon: flakes + the new `nix` CLI
   # ============================================================
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+
+    # Binary caches. nix-community carries unfree/community builds that
+    # cache.nixos.org can't redistribute (SSPL-licensed packages, etc.).
+    # cache.nixos.org and its key are added by NixOS automatically.
+    substituters = [
+      "https://nix-community.cachix.org"
+    ];
+
+    trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
 
   # ============================================================
   #  Networking
@@ -38,9 +51,12 @@
   # ============================================================
   #  Bluetooth
   # ============================================================
+  # Plasma's Bluedevil stack owns the tray + notifications. Do NOT enable
+  # blueman here — a second Bluetooth applet (leftover from Hyprland days)
+  # doubles every connect/disconnect toast and leaves sticky tray items.
   hardware.bluetooth.enable      = true;
   hardware.bluetooth.powerOnBoot = true;
-  services.blueman.enable        = true;
+  services.blueman.enable        = false;
 
   # ============================================================
   #  Remote shell
@@ -51,8 +67,6 @@
   #  Power management — prevent idle suspend so long-running
   #  sessions (Claude, builds) aren't killed overnight.
   #  The screen may still turn off (fine); the PC will not sleep.
-  #  If you ever add hypridle, make sure it doesn't call
-  #  `systemctl suspend` either, or this won't be enough on its own.
   # ============================================================
   services.logind.settings.Login = {
     IdleAction = "ignore";
@@ -61,22 +75,33 @@
   };
 
   # ============================================================
+  #  Nix store: automatic GC + deduplication
+  # ============================================================
+  nix.gc = {
+    automatic = true;
+    dates     = "weekly";
+    options   = "--delete-older-than 30d";
+  };
+
+  nix.settings.auto-optimise-store = true;
+
+  # ============================================================
   #  Allow unfree packages (VSCode, Reaper, Brave, etc.)
   # ============================================================
   nixpkgs.config.allowUnfree = true;
 
   # ============================================================
-  #  Fonts — system-wide so every app (waybar, kitty, Plasma, …)
+  #  Fonts — system-wide so every app (kitty, Plasma, …)
   #  can render glyph icons.
   # ============================================================
   fonts = {
     packages = with pkgs; [
-      nerd-fonts.jetbrains-mono   # monospace + the glyph icons waybar/kitty use
+      nerd-fonts.jetbrains-mono   # monospace + glyph icons (kitty, prompts)
       noto-fonts                  # wide multilingual coverage
       noto-fonts-color-emoji      # colour emoji 🎸
       font-awesome                # extra UI icons
       corefonts                   # MS fonts (Arial / Times New Roman / …) for web + docs
-      vista-fonts                  # MS fonts (Calibri / Cambria / …) for web + docs
+      vista-fonts                 # MS fonts (Calibri / Cambria / …) for web + docs
     ];
     # Tell apps which font to reach for by default per category.
     fontconfig.defaultFonts = {

@@ -8,15 +8,22 @@
     # ----- General desktop -----
     vim
     tmux                  # Terminal multiplexer — sessions survive disconnects/restarts
+    kitty                 # Default terminal (look configured in home-manager/kitty.nix)
     brave
     microsoft-edge
     claude-code
     gemini-cli
     wget
+    # Obsidian app + CLI (binaries: `obsidian`, `obsidian-cli`). CLI is on PATH
+    # so AI agents can read/write the vault without the GUI.
     obsidian
     libreoffice
     freecad
-    vlc                  # Universal audio/video player
+    vlc                   # Universal audio/video player
+    # WhatsApp / YouTube Music: no solid native clients on nixpkgs right now
+    # (karere was glitchy; pear-desktop threw missing-package errors). Use the
+    # Brave web-app launchers in home-manager/web-apps.nix instead.
+    kdePackages.kate
     # TODO: voice-typing à la Handy. Nothing in nixpkgs gives the
     # one-line install; revisit as a follow-up (whisper-cpp + hotkey).
 
@@ -42,7 +49,7 @@
     lsp-plugins
     calf
     x42-plugins
-    surge-XT
+    surge-xt
     vital
     dragonfly-reverb
 

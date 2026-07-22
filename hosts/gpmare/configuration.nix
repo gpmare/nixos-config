@@ -12,7 +12,6 @@
 
     ../../modules/system.nix
     ../../modules/desktop.nix
-    ../../modules/thunar.nix
     ../../modules/audio.nix
     ../../modules/dev.nix
     ../../modules/packages.nix
@@ -40,9 +39,6 @@
     # root (see hardware.i2c.enable in modules/desktop.nix). Group
     # membership only takes effect after a full logout/reboot.
     extraGroups = [ "networkmanager" "wheel" "audio" "i2c" ];
-    packages = with pkgs; [
-      kdePackages.kate
-    ];
   };
 
   # ============================================================

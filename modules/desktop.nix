@@ -29,6 +29,20 @@
   services.displayManager.sddm.wayland.enable = true;
 
   # ============================================================
+  #  Remote desktop (KRDP — control this machine from the laptop)
+  # ============================================================
+  # KDE's native remote-desktop server. Unlike classic VNC (which reads
+  # the X11 framebuffer that Wayland no longer exposes), KRDP streams the
+  # real logged-in KWin session over the RDP protocol — so Windows'
+  # built-in "Remote Desktop Connection" (mstsc.exe) connects with no
+  # extra client software. Enable it and set the RDP username/password in
+  # System Settings -> Remote Desktop (stored per-user, so not declared
+  # here). RDP is TLS-encrypted. Keep port 3389 on the LAN only — never
+  # port-forward it on the router; use Tailscale if you want it remotely.
+  environment.systemPackages = [ pkgs.kdePackages.krdp ];
+  networking.firewall.allowedTCPPorts = [ 3389 ];
+
+  # ============================================================
   #  External-monitor brightness (DDC/CI)
   # ============================================================
   # Desktop monitors have no OS-dimmable backlight; they accept

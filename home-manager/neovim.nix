@@ -9,7 +9,7 @@
     defaultEditor = true;   # sets $EDITOR=nvim
     vimAlias      = true;   # `vim` → `nvim`
 
-    extraLuaConfig = ''
+    initLua = ''
       -- ============================================================
       --  Blade Runner 2049 — mirrors kitty terminal palette
       -- ============================================================
