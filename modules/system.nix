@@ -36,6 +36,16 @@
   # the networkmanager module sets it itself, so explicitly setting
   # it here conflicts).
   networking.networkmanager.enable = true;
+  # Intel AX200: radio power-save causes missed beacons / drops
+  # (same class of instability as on Windows with this chip).
+  networking.networkmanager.wifi.powersave = false;
+
+  # iwlmvm power_scheme: 1=always-on, 2=balanced (default), 3=low-power.
+  # Both modules must be set; iwlmvm alone overrides iwlwifi.
+  boot.extraModprobeConfig = ''
+    options iwlwifi power_save=0
+    options iwlmvm power_scheme=1
+  '';
 
   # ============================================================
   #  Locale + time zone

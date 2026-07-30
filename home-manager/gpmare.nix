@@ -11,6 +11,7 @@
   imports = [
     ./neovim.nix
     ./vscode.nix
+    ./cursor.nix
     ./brightness.nix
     ./kitty.nix
     ./web-apps.nix
@@ -82,6 +83,9 @@
     '';
     shellAliases = {
       conf    = "code ~/nixos-config";                              # open the config repo
+      # Drop into the flake and start Grok (same as: cd ~/nixos-config && grok).
+      # Remaining args are passed through: `config "fix foo"`.
+      config  = "cd ~/nixos-config && grok";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#gpmare";  # apply changes
       open = "xdg-open"; # open a file or URL in the default app
     };
@@ -137,6 +141,17 @@
   # ============================================================
   programs.git = {
     enable = true;
+    # Personal tool droppings, kept out of every repo's `git status` without
+    # editing a shared .gitignore. `.serena/` is the Serena MCP server's
+    # per-project index/cache; `.mcp.json` is the local MCP config each repo
+    # ships only as `.mcp.json.example`.
+    ignores = [
+      ".serena/"
+      ".mcp.json"
+      ".direnv/"
+      "result"
+      "result-*"
+    ];
     settings = {
       user = {
         name  = "Gerhard";

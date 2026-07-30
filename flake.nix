@@ -55,18 +55,18 @@
           home-manager.nixosModules.home-manager
 
           # Inline module: configure home-manager itself.
-          {
+          ({ pkgs, ... }: {
             home-manager.useGlobalPkgs   = true;
             home-manager.useUserPackages = true;
-            # If HM would overwrite a file it didn't create, rename the old
-            # one to <file>.hm-bak instead of aborting. Prevents the
-            # "Existing file ... would be clobbered" activation error when
-            # an app (e.g. VS Code) wrote its own config before HM took over.
-            home-manager.backupFileExtension = "hm-bak";
+            # If HM would overwrite a file it doesn't own, move it aside
+            # with a unique timestamped suffix. A fixed ".hm-bak" collides
+            # on the second rebuild and aborts activation.
+            home-manager.backupCommand =
+              "${pkgs.coreutils}/bin/mv \"$1\" \"$1.hm-bak.$(${pkgs.coreutils}/bin/date +%Y%m%d%H%M%S)\"";
             home-manager.extraSpecialArgs = { inherit inputs username; };
             home-manager.users.${username} =
               import ./home-manager/${username}.nix;
-          }
+          })
         ];
       };
     };

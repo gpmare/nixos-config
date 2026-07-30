@@ -23,7 +23,7 @@ home-manager/
   web-apps.nix                         Google Calendar desktop entry
   agent-instructions.md                shared Claude/Grok global rules
   brightness.nix                       Plasma DDC/CI brightness fix
-  neovim.nix / vscode.nix              editors
+  neovim.nix / vscode.nix / cursor.nix editors
 Makefile                               make switch / update / clean
 ```
 

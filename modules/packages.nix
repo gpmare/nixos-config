@@ -17,6 +17,9 @@
     # Obsidian app + CLI (binaries: `obsidian`, `obsidian-cli`). CLI is on PATH
     # so AI agents can read/write the vault without the GUI.
     obsidian
+    # Mail client. Plain package — no HM account wiring, no policies.
+    # Updates via nixpkgs (`make update` + rebuild), not the in-app updater.
+    thunderbird
     libreoffice
     freecad
     vlc                   # Universal audio/video player
@@ -24,6 +27,8 @@
     # (karere was glitchy; pear-desktop threw missing-package errors). Use the
     # Brave web-app launchers in home-manager/web-apps.nix instead.
     kdePackages.kate
+    # Pomotroid: not in nixpkgs — local AppImage package under pkgs/.
+    (callPackage ../pkgs/pomotroid.nix { })
     # TODO: voice-typing à la Handy. Nothing in nixpkgs gives the
     # one-line install; revisit as a follow-up (whisper-cpp + hotkey).
 
