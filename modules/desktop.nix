@@ -53,4 +53,18 @@
   # turned on in each monitor's on-screen menu; run `ddcutil detect`
   # to confirm both screens are seen.
   hardware.i2c.enable = true;
+
+  # Claude Desktop Cowork probes /dev/vhost-vsock at launch. Load the
+  # module every boot so the check does not fail after a reboot.
+  boot.kernelModules = [ "vhost_vsock" ];
+
+  # ============================================================
+  #  Logitech Unifying / Bolt / Lightspeed + Bluetooth (Solaar)
+  # ============================================================
+  # Linux stand-in for Logi Options+: pairing, battery, DPI, and
+  # button mapping for MX / Lift / M-series. udev rules come with
+  # the module; the tray app is `solaar`. Lift is Bluetooth on this
+  # machine — Solaar still sees it via hidraw.
+  hardware.logitech.wireless.enable = true;
+  hardware.logitech.wireless.enableGraphical = true;
 }

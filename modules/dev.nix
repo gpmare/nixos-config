@@ -118,7 +118,15 @@
 
     # ----- Language runtimes (broad starter set) -----
     nodejs_24            # JavaScript / TypeScript projects
-    python313            # Python projects + scripts
+    # System-wide, not mise: agents spawn non-interactive shells that never
+    # load mise shims, and every gate recipe is `bun run` / `bun test` / `bunx`.
+    # Elysia backend tests also need Bun's globals (`Bun`, `bun:test`).
+    bun
+    # Standalone binary. Node's corepack cannot write pnpm shims into the
+    # read-only nix store prefix, so `corepack enable pnpm` is a no-op here.
+    pnpm
+    # lowPrio: `python3` on PATH is the withPackages env in packages.nix.
+    (lib.lowPrio python313)  # Python projects + scripts (`python3.13`)
 
   ];
 
@@ -126,4 +134,31 @@
   #  MongoDB — run as a system service (data in /var/db/mongodb)
   # ============================================================
   services.mongodb.enable = true;
+
+  # Raise the open-file limit for mongod. The nixpkgs module sets no
+  # LimitNOFILE, so systemd's default applies — soft 1024, hard 524288 — and
+  # mongod does not raise its own soft limit at startup. The template repo's
+  # backend suite gives each of its ~26 suites its own database, and the
+  # resulting WiredTiger file handles blow past 1024 part-way through a run:
+  #   Location13538 "couldn't open [/proc/<pid>/stat] Too many open files"
+  # immediately followed by a fatal assertion in wiredtiger_util.cpp, i.e.
+  # mongod dies mid-suite and every later test fails as a connection error.
+  # A single value sets soft = hard, which is what actually fixes it; 64000 is
+  # MongoDB's own documented recommendation.
+  # Verify after a rebuild with:
+  #   grep 'Max open files' /proc/$(pgrep -x mongod)/limits
+  systemd.services.mongodb.serviceConfig.LimitNOFILE = 64000;
+
+  # The template suite (and leftover `mongod --dbpath /tmp/dev-db-integrate`)
+  # also binds :27017. nixpkgs' forking unit then fails with exit 48
+  # ("Address already in use") and `nixos-rebuild switch` returns 4 even
+  # though the new generation activated. ExecCondition 1–254 = skip, not fail.
+  systemd.services.mongodb.serviceConfig.ExecCondition =
+    pkgs.writeShellScript "mongodb-port-free" ''
+      if ${pkgs.iproute2}/bin/ss -H -ltn 'sport = :27017' \
+           | ${pkgs.gnugrep}/bin/grep -q .; then
+        echo "mongodb: :27017 already in use; skipping system mongod" >&2
+        exit 1
+      fi
+    '';
 }

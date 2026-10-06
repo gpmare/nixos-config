@@ -15,7 +15,7 @@ succeed on the first try**.
 | --- | --- |
 | Add a GUI app / system-wide binary on `$PATH` | `modules/packages.nix` |
 | Add CLI / git / language runtimes / nix-ld libs | `modules/dev.nix` |
-| Change boot, network, locale, SSH, GC, fonts, unfree | `modules/system.nix` |
+| Change boot, network, locale, SSH, Tailscale, GC, fonts, unfree | `modules/system.nix` |
 | Change Plasma / SDDM / Wayland / RDP / DDC brightness kernel bits | `modules/desktop.nix` |
 | Change PipeWire / musnix / Scarlett audio | `modules/audio.nix` |
 | Per-host hostname, LUKS UUID, user groups | `hosts/gpmare/configuration.nix` |
@@ -26,8 +26,16 @@ succeed on the first try**.
 | Brave web-app desktop entries (Calendar, WhatsApp, YT Music) | `home-manager/web-apps.nix` |
 | External-monitor brightness fix (user-level) | `home-manager/brightness.nix` |
 | Package **not** in nixpkgs (AppImage, local drv) | `pkgs/<name>.nix` + `callPackage` from a module |
+| Hermes Agent (Docker gateway + local dashboard) | `modules/hermes.nix` |
+| Local voice dictation (whisper-flow) | `modules/whisper-flow.nix` + `home-manager/plasma.nix` |
+| Claude Desktop (official Linux .deb) | `pkgs/claude-desktop.nix` + `modules/claude-desktop.nix` (`programs.claude-desktop.enable`) |
+| Grok Bot (official Linux .deb) | `pkgs/grok-bot.nix` via `callPackage` in `modules/packages.nix` |
+| Claude Code CLI | `pkgs/claude-code-manifest.json` override of `pkgs.claude-code` in `modules/packages.nix` |
+| Windows Alt+numpad codes (Alt+130 → é) | `modules/alt-codes.nix` + `pkgs/alt-codes.py` |
+| Logitech mouse (Solaar — Lift / MX / Bolt) | `modules/desktop.nix` (`hardware.logitech.wireless`) |
 | Flake inputs / host wiring / home-manager glue | `flake.nix` |
 | Pin of all inputs | `flake.lock` (via `make update`, not by hand) |
+| Daily midnight flake update + switch | `modules/auto-upgrade.nix` |
 | Global agent response style (synced to `~/.claude/CLAUDE.md`) | `home-manager/agent-instructions.md` |
 | Human-facing overview | `README.md` |
 | Rebuild shortcuts | `Makefile` (`switch`, `build`, `test`, `update`, `clean`) |
@@ -38,11 +46,11 @@ succeed on the first try**.
 flake.nix
   └─ nixosConfigurations.gpmare
        ├─ hosts/gpmare/configuration.nix
-       │    imports → modules/{system,desktop,audio,dev,packages}.nix
+       │    imports → modules/{system,desktop,audio,dev,packages,hermes,whisper-flow,alt-codes,claude-desktop,auto-upgrade}.nix
        │              + hardware-configuration.nix
-       ├─ musnix, nix-index-database, home-manager (external modules)
+       ├─ musnix, nix-index-database, plasma-manager, home-manager (external modules)
        └─ home-manager.users.gpmare ← home-manager/gpmare.nix
-            imports → neovim, vscode, cursor, brightness, kitty, web-apps
+            imports → neovim, vscode, cursor, brightness, kitty, web-apps, plasma
 ```
 
 `specialArgs` / `extraSpecialArgs` already pass `inputs`, `username`, `hostname`.

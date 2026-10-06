@@ -15,6 +15,8 @@
     ./brightness.nix
     ./kitty.nix
     ./web-apps.nix
+    ./work-awake.nix
+    ./plasma.nix
   ];
 
   # ============================================================
@@ -88,15 +90,17 @@
       config  = "cd ~/nixos-config && grok";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#gpmare";  # apply changes
       open = "xdg-open"; # open a file or URL in the default app
+      # Talk to the Hermes container (needs docker group; log out once after first switch).
+      hermes = "docker exec -it hermes hermes";
     };
   };
 
   # ============================================================
   #  Prompt — Starship
   # ============================================================
-  # Two-line prompt: directory + git info on line 1, orange ❯ on line 2.
+  # Two-line prompt: directory + git info on line 1, ❯ on line 2.
   # No username or hostname — you know who you are.
-  # Prompt tuned for the light Apple Terminal kitty theme (kitty.nix).
+  # Colours match the Gruvbox Dark Medium kitty theme (kitty.nix).
   programs.starship = {
     enable                = true;
     enableBashIntegration = true;
@@ -105,13 +109,12 @@
       add_newline = true;
 
       character = {
-        success_symbol = "[❯](bold #007aff)";  # macOS system blue
-        error_symbol   = "[❯](bold #ff3b30)";
+        success_symbol = "[❯](bold #b8bb26)";
+        error_symbol   = "[❯](bold #fb4934)";
       };
 
-      # Blues/greys that stay readable on both light and dark kitty themes.
       directory = {
-        style             = "bold #0a84ff";
+        style             = "bold #83a598";
         truncation_length = 3;
         truncate_to_repo  = false;
         format            = "[$path]($style) ";
@@ -119,18 +122,18 @@
 
       git_branch = {
         symbol = " ";
-        style  = "#5ac8fa";
+        style  = "#8ec07c";
         format = "[$symbol$branch]($style) ";
       };
 
       git_status = {
-        style  = "#8e8e93";
+        style  = "#a89984";
         format = "[$all_status$ahead_behind]($style) ";
       };
 
       cmd_duration = {
         min_time          = 2000;
-        style             = "#8e8e93";
+        style             = "#a89984";
         format            = "[$duration]($style) ";
       };
     };
@@ -173,4 +176,13 @@
   # home AGENTS.md — that double-loads the same text every session.
   # Project-specific rules belong in each repo's AGENTS.md / CLAUDE.md.
   home.file.".claude/CLAUDE.md".source = ./agent-instructions.md;
+
+  # Global Claude Code skill: design review, available in every project
+  # regardless of what's declared in that repo's own .claude/skills/.
+  home.file.".claude/skills/design-review/SKILL.md".source = ./agent-skill-design-review.md;
+
+  # Global Claude Code skill: check code against the primary legislation it
+  # implements. Needs poppler_utils on PATH (modules/packages.nix) — most South
+  # African Acts are PDFs, and the agent's built-in fetch cannot read those.
+  home.file.".claude/skills/legislation-audit/SKILL.md".source = ./agent-skill-legislation-audit.md;
 }

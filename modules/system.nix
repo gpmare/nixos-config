@@ -26,7 +26,27 @@
     trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
+
+    # A dead IPv6 hop used to kill a transfer after a few megabytes.
+    # Retry the whole NAR rather than leaving a truncated store path.
+    download-attempts = 10;
+    connect-timeout = 10;
   };
+
+  # The wifi router advertises IPv6 and installs a default route, but
+  # packets to cache.nixos.org and pypi.org on that route time out.
+  # IPv4 to the same hosts answers in under a second. Prefer IPv4 for
+  # name lookups. Tailscale's own IPv6 addresses still work.
+  environment.etc."gai.conf".text = ''
+    precedence ::ffff:0:0/96 100
+  '';
+
+  # pip reads this for venv installs. Retries a dropped PyPI connection.
+  environment.etc."pip.conf".text = ''
+    [global]
+    timeout = 60
+    retries = 10
+  '';
 
   # ============================================================
   #  Networking
@@ -74,14 +94,36 @@
   services.openssh.enable = true;
 
   # ============================================================
-  #  Power management — prevent idle suspend so long-running
-  #  sessions (Claude, builds) aren't killed overnight.
-  #  The screen may still turn off (fine); the PC will not sleep.
+  #  Tailscale — mesh VPN
+  # ============================================================
+  # Phone (Termux) and this desktop (Termius) reach SSH/RDP over the
+  # tailnet. Do not port-forward 22 or 3389 on the router (KRDP note in
+  # desktop.nix). After first switch: `sudo tailscale up` (browser login).
+  # Termux itself is Android-only and is not in nixpkgs.
+  services.tailscale.enable = true;
+  services.tailscale.openFirewall = true;
+
+  # ============================================================
+  #  Power management (logind half)
+  #  IdleAction=ignore: logind itself never suspends on idle.
+  #  Plasma PowerDevil still can (it talks to logind separately) —
+  #  see home-manager/work-awake.nix, which blocks *idle* sleep
+  #  while Claude/Grok sessions are running, but drops that block
+  #  when the lid closes so a laptop actually suspends in a bag.
+  #  Screen blanking is fine.
+  #
+  #  HandleLidSwitch*: PowerDevil claims the lid via a logind
+  #  inhibitor while a Plasma session is up; these are the fallback
+  #  at SDDM / no graphical session. Docked stays ignore so a
+  #  closed-lid clamshell (external monitor) keeps running.
   # ============================================================
   services.logind.settings.Login = {
     IdleAction = "ignore";
     HandleSuspendKey = "ignore";
     HandleHibernateKey = "ignore";
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
+    HandleLidSwitchDocked = "ignore";
   };
 
   # ============================================================

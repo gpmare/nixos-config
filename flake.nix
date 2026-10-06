@@ -26,13 +26,19 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   # ============================================================
   #  Outputs: what this flake provides.
   #  `outputs` is a FUNCTION from inputs -> attribute set.
   # ============================================================
-  outputs = { self, nixpkgs, home-manager, musnix, nix-index-database, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, musnix, nix-index-database, plasma-manager, ... }@inputs:
     let
       system   = "x86_64-linux";
       hostname = "gpmare";
@@ -64,6 +70,9 @@
             home-manager.backupCommand =
               "${pkgs.coreutils}/bin/mv \"$1\" \"$1.hm-bak.$(${pkgs.coreutils}/bin/date +%Y%m%d%H%M%S)\"";
             home-manager.extraSpecialArgs = { inherit inputs username; };
+            home-manager.sharedModules = [
+              plasma-manager.homeModules.plasma-manager
+            ];
             home-manager.users.${username} =
               import ./home-manager/${username}.nix;
           })

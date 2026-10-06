@@ -1,26 +1,132 @@
-# Pomotroid is not in nixpkgs (package request closed). Ship the official
-# Linux AppImage via appimageTools so it shows up in the app menu + $PATH.
-{ lib, appimageTools, fetchurl }:
+# Pomotroid is not in nixpkgs. The official AppImage dies on NixOS with
+#   Could not create default EGL display: EGL_BAD_PARAMETER
+# because its bundled WebKit + bubblewrap FHS fight the host Mesa drivers.
+# Package the .deb instead: autoPatchelf against nixpkgs webkitgtk_4_1/gtk3.
+{
+  lib,
+  stdenv,
+  fetchurl,
+  dpkg,
+  autoPatchelfHook,
+  wrapGAppsHook3,
+  copyDesktopItems,
+  makeDesktopItem,
+  webkitgtk_4_1,
+  gtk3,
+  glib,
+  cairo,
+  pango,
+  gdk-pixbuf,
+  at-spi2-atk,
+  libsoup_3,
+  libxkbcommon,
+  wayland,
+  openssl,
+  libayatana-appindicator,
+  zlib,
+  fontconfig,
+  freetype,
+  harfbuzz,
+  fribidi,
+  expat,
+  dbus,
+  alsa-lib,
+  libgcc,
+  xorg,
+  libdrm,
+  mesa,
+  libgbm,
+  libGL,
+}:
 
-let
+stdenv.mkDerivation rec {
   pname = "pomotroid";
   version = "1.7.1";
 
   src = fetchurl {
-    url = "https://github.com/Splode/pomotroid/releases/download/v${version}/Pomotroid_${version}_amd64.AppImage";
-    hash = "sha256-p9GcZarpcH613lJGidvsnbNukFQemoClM7pK7gR2ImY=";
+    url = "https://github.com/Splode/pomotroid/releases/download/v${version}/Pomotroid_${version}_amd64.deb";
+    hash = "sha256-obVbM7O6GFc5jTCyRsa8DvJjSsnWl+FRlIsizoh9JNQ=";
   };
 
-  appimageContents = appimageTools.extractType2 { inherit pname version src; };
-in
-appimageTools.wrapType2 {
-  inherit pname version src;
+  nativeBuildInputs = [
+    dpkg
+    autoPatchelfHook
+    wrapGAppsHook3
+    copyDesktopItems
+  ];
 
-  extraInstallCommands = ''
-    install -m 444 -D ${appimageContents}/Pomotroid.desktop \
-      $out/share/applications/pomotroid.desktop
-    install -m 444 -D ${appimageContents}/usr/share/icons/hicolor/128x128/apps/pomotroid.png \
-      $out/share/icons/hicolor/128x128/apps/pomotroid.png
+  buildInputs = [
+    webkitgtk_4_1
+    gtk3
+    glib
+    cairo
+    pango
+    gdk-pixbuf
+    at-spi2-atk
+    libsoup_3
+    libxkbcommon
+    wayland
+    openssl
+    libayatana-appindicator
+    zlib
+    fontconfig
+    freetype
+    harfbuzz
+    fribidi
+    expat
+    dbus
+    alsa-lib
+    libgcc
+    stdenv.cc.cc.lib
+    xorg.libX11
+    xorg.libXcursor
+    xorg.libXrandr
+    xorg.libXi
+    xorg.libXext
+    xorg.libXfixes
+    xorg.libXrender
+    xorg.libxcb
+    libdrm
+    mesa
+    libgbm
+    libGL
+  ];
+
+  desktopItems = [
+    (makeDesktopItem {
+      name = "pomotroid";
+      desktopName = "Pomotroid";
+      comment = "A beautiful Pomodoro timer";
+      exec = "pomotroid";
+      icon = "pomotroid";
+      categories = [ "Utility" ];
+      startupWMClass = "pomotroid";
+    })
+  ];
+
+  dontConfigure = true;
+  dontBuild = true;
+
+  unpackPhase = ''
+    runHook preUnpack
+    dpkg-deb -x $src .
+    runHook postUnpack
+  '';
+
+  installPhase = ''
+    runHook preInstall
+    mkdir -p $out/bin $out/share
+    install -Dm755 usr/bin/pomotroid $out/bin/pomotroid
+    cp -a usr/share/icons $out/share/
+    runHook postInstall
+  '';
+
+  # Host WebKit is fine; DMABUF can still flake on some AMD + Wayland setups.
+  preFixup = ''
+    gappsWrapperArgs+=(
+      --set WEBKIT_DISABLE_DMABUF_RENDERER 1
+      --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+    )
   '';
 
   meta = {
