@@ -63,18 +63,18 @@
 
 let
   # Shared across arches; the arch segment of the URL is per-source below.
-  buildId = "c1e7d7a46549956d25f53e9c0b9f59666e03aa3a";
+  buildId = "33103062f95061ccf9c81c5b365d37ab152c3b66";
 
   sources = {
     x86_64-linux = {
       arch = "x64";
       debArch = "amd64";
-      hash = "sha256-EcoPUaU1uXr1GjUq35wPns0uGwQwpprpRRtoinoGWAg=";
+      hash = "sha256-sr6BBtKz6uB9mD1fHKd7ZXrM3mZtxEDbKkCUIez/M1k=";
     };
     aarch64-linux = {
       arch = "arm64";
       debArch = "arm64";
-      hash = "sha256-g2+NGdOCbGVzwxrEXHqbeXq8czga4NKx56ja5UEOfkY=";
+      hash = "sha256-P4X74ro8HRIqoW+L5nIHa8GRRuB+nUMfN6k7hfp1qT8=";
     };
   };
 
@@ -132,7 +132,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "grok-bot";
-  version = "0.47.0";
+  version = "0.68.1";
 
   src = fetchurl {
     url = "https://downloads.cursor.com/grokbot/stable/${buildId}/linux/${source.arch}/grok-bot_${finalAttrs.version}_${source.debArch}.deb";
