@@ -49,7 +49,7 @@
   # brightness commands over the video cable via DDC/CI. KDE's
   # brightness slider (Powerdevil) drives this, but it needs the i2c
   # kernel interface enabled and the user in the "i2c" group (see
-  # extraGroups in hosts/gpmare/configuration.nix). DDC/CI must also be
+  # extraGroups in hosts/common.nix). DDC/CI must also be
   # turned on in each monitor's on-screen menu; run `ddcutil detect`
   # to confirm both screens are seen.
   hardware.i2c.enable = true;

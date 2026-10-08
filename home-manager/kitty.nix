@@ -109,11 +109,37 @@
     kitty.desktop
   '';
 
+  # Hidden launcher so Plasma can bind Super+T (Win+T) to Kitty.
+  xdg.desktopEntries.launch-kitty = {
+    name = "Kitty Terminal";
+    exec = "kitty";
+    icon = "kitty";
+    terminal = false;
+    noDisplay = true;
+    settings = {
+      "X-KDE-GlobalAccel-CommandShortcut" = "true";
+      "X-KDE-Shortcuts" = "Meta+T";
+    };
+  };
+
   home.activation.setKittyAsPlasmaTerminal =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 \
         --file kdeglobals --group General --key TerminalApplication kitty
       ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 \
         --file kdeglobals --group General --key TerminalService kitty.desktop
+
+      # Super+T is KWin's tiles editor by default — free it for Kitty.
+      ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --notify \
+        --file kglobalshortcutsrc --group kwin --key "Edit Tiles" \
+        "none,Meta+T,Toggle Tiles Editor"
+      ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --notify \
+        --file kglobalshortcutsrc --group launch-kitty.desktop \
+        --key _k_friendly_name "Kitty Terminal"
+      ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --notify \
+        --file kglobalshortcutsrc --group launch-kitty.desktop \
+        --key _launch "Meta+T,none,Kitty Terminal"
+
+      ${pkgs.kdePackages.kservice}/bin/kbuildsycoca6 >/dev/null 2>&1 || true
     '';
 }

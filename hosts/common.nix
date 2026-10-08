@@ -1,5 +1,7 @@
-# Per-host entry point for the "gpmare" machine.
-# Pulls in hardware config + every shared module under ../../modules/.
+# Shared by every host (nucbox, dell). Everything that is not tied to one
+# machine's hardware lives here or in ../modules/. Each host's own file
+# (hosts/<host>/configuration.nix) imports this plus its
+# hardware-configuration.nix and sets only genuinely per-machine bits.
 
 { config, lib, pkgs, inputs, hostname, username, ... }:
 
@@ -8,18 +10,17 @@
   #  Imports
   # ============================================================
   imports = [
-    ./hardware-configuration.nix
-
-    ../../modules/system.nix
-    ../../modules/desktop.nix
-    ../../modules/audio.nix
-    ../../modules/dev.nix
-    ../../modules/packages.nix
-    ../../modules/hermes.nix
-    ../../modules/whisper-flow.nix
-    ../../modules/alt-codes.nix
-    ../../modules/claude-desktop.nix
-    ../../modules/auto-upgrade.nix
+    ../modules/system.nix
+    ../modules/desktop.nix
+    ../modules/audio.nix
+    ../modules/dev.nix
+    ../modules/packages.nix
+    ../modules/hermes-client.nix
+    ../modules/whisper-flow.nix
+    ../modules/alt-codes.nix
+    ../modules/claude-desktop.nix
+    ../modules/auto-upgrade.nix
+    ../modules/axiom.nix
   ];
 
   # Official Claude Desktop Linux .deb (pkgs/claude-desktop.nix).
@@ -28,23 +29,14 @@
   # ============================================================
   #  Host identity
   # ============================================================
+  # `hostname` comes from flake.nix (mkHost "nucbox" / mkHost "dell") and
+  # must match the nixosConfigurations attr: `make switch` and the nightly
+  # auto-upgrade pick the config by the machine's hostname.
   networking.hostName = hostname;
 
-  # ============================================================
-  #  LUKS-encrypted root partition
-  # ============================================================
-  boot.initrd.luks.devices."luks-5f8e2b15-11a6-4511-851c-2110170d173a".device =
-    "/dev/disk/by-uuid/5f8e2b15-11a6-4511-851c-2110170d173a";
-
-  # ============================================================
-  #  Ollama GPU — AMD 780M (Phoenix / gfx1103)
-  # ============================================================
-  # whisper-flow.nix enables ollama on CPU by default. This host has a
-  # Radeon 780M that ROCm does not detect as a supported gfx, so override
-  # the LLVM target. Do not set nixpkgs.config.rocmSupport (rebuilds the
-  # world); pkgs.ollama-rocm is the prebuilt attr.
-  services.ollama.package = pkgs.ollama-rocm;
-  services.ollama.rocmOverrideGfx = "11.0.3";
+  # Docker on every host (dev use + `docker` group below). The Hermes
+  # gateway container itself is nucbox-only (modules/hermes.nix).
+  virtualisation.docker.enable = true;
 
   # ============================================================
   #  User account
@@ -64,6 +56,8 @@
 
   # ============================================================
   #  State version — read the docs before changing this.
+  #  Both machines were installed on 26.05. A future host installed on a
+  #  different release must set its own value in its configuration.nix.
   # ============================================================
-  system.stateVersion = "26.05";
+  system.stateVersion = lib.mkDefault "26.05";
 }

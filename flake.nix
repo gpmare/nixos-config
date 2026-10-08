@@ -32,6 +32,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # Hermes Agent (Nous) client apps — modules/hermes-client.nix.
+    # Own nixpkgs pin — do not `follows` ours; the flake is uv2nix-locked
+    # and breaks if nixpkgs is swapped.
+    hermes-agent.url = "github:NousResearch/hermes-agent";
   };
 
   # ============================================================
@@ -41,10 +46,12 @@
   outputs = { self, nixpkgs, home-manager, musnix, nix-index-database, plasma-manager, ... }@inputs:
     let
       system   = "x86_64-linux";
-      hostname = "gpmare";
       username = "gpmare";
-    in {
-      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+
+      # One NixOS system per machine. Everything shared lives in
+      # hosts/common.nix + modules/; hosts/<hostname>/ holds only that
+      # machine's hardware and hardware-specific bits.
+      mkHost = hostname: nixpkgs.lib.nixosSystem {
         inherit system;
 
         # specialArgs is how we hand `inputs`, `username`, etc. down
@@ -52,7 +59,8 @@
         specialArgs = { inherit inputs username hostname; };
 
         modules = [
-          # The host's own entry-point — pulls in our modules/.
+          # The host's own entry-point — imports hosts/common.nix,
+          # which pulls in our modules/.
           ./hosts/${hostname}/configuration.nix
 
           # External NixOS modules.
@@ -77,6 +85,12 @@
               import ./home-manager/${username}.nix;
           })
         ];
+      };
+    in {
+      # Attr name == machine hostname (make switch / auto-upgrade rely on it).
+      nixosConfigurations = {
+        nucbox = mkHost "nucbox";  # GMKtec NucBox K8 Plus mini PC (AMD)
+        dell   = mkHost "dell";    # Dell Latitude 3540 laptop (Intel)
       };
     };
 }

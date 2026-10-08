@@ -12,8 +12,11 @@
 # activates, the regenerated nix.conf is correct and plain `rebuild` works.
 set -euo pipefail
 
+# Host = this machine's nixosConfigurations attr (nucbox / dell).
+HOST="${1:-$(hostname)}"
+
 sudo nixos-rebuild switch \
-  --flake /home/gpmare/nixos-config#gpmare \
+  --flake "/home/gpmare/nixos-config#${HOST}" \
   --option substituters \
     "https://cache.nixos.org https://nix-community.cachix.org https://hyprland.cachix.org" \
   --option trusted-public-keys \

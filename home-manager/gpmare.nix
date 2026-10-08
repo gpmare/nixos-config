@@ -88,7 +88,7 @@
       # Drop into the flake and start Grok (same as: cd ~/nixos-config && grok).
       # Remaining args are passed through: `config "fix foo"`.
       config  = "cd ~/nixos-config && grok";
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#gpmare";  # apply changes
+      rebuild = "make -C ~/nixos-config switch";  # apply changes (host = this hostname)
       open = "xdg-open"; # open a file or URL in the default app
       # Talk to the Hermes container (needs docker group; log out once after first switch).
       hermes = "docker exec -it hermes hermes";

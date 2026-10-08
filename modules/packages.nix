@@ -68,6 +68,9 @@
     # ----- Music production -----
     # Wrap reaper so it loads PipeWire's JACK compat libs, not a real JACK server.
     # Equivalent to running `pw-jack reaper` but works from launchers and .desktop files too.
+    # The second LD_LIBRARY_PATH line feeds the ReaPack add-on (downloaded into
+    # ~/.config/REAPER/UserPlugins) the web/zip/XML libraries it needs to start.
+    # libxml2_13 is the older libxml2 that still provides libxml2.so.2.
     (symlinkJoin {
       name = "reaper";
       paths = [ reaper ];
@@ -75,6 +78,7 @@
       postBuild = ''
         wrapProgram $out/bin/reaper \
           --prefix LD_LIBRARY_PATH : "${pipewire.jack}/lib" \
+          --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ curl zlib libxml2_13 ]}" \
           --prefix LV2_PATH : "/run/current-system/sw/lib/lv2" \
           --prefix LADSPA_PATH : "/run/current-system/sw/lib/ladspa"
       '';
@@ -82,6 +86,16 @@
     guitarix             # Guitar amp/cab simulator
     qpwgraph             # PipeWire patchbay (visual audio routing)
     pavucontrol          # Per-app audio device + volume control
+    ffmpeg-full          # Convert/trim audio+video; full build has loudnorm/ebur128 (loudness matching)
+    xvfb-run             # Runs Reaper on an invisible screen, so scripted renders never pop up
+                         #   e.g. xvfb-run -a reaper -nosplash -renderproject ~/Music/HGM-Projects/x.rpp
+    alsa-utils           # MIDI checks: aconnect -l (list ports), aseqdump (watch notes), amidi
+    usbutils             # lsusb: shows whether a USB device (piano, interface) is detected
+
+    # ----- Sheet music / notation -----
+    musescore            # MuseScore 4: write and play back sheet music, exports MIDI/MusicXML
+                         # Muse Sounds (MuseHub) is not in nixpkgs, so not installed here.
+    lilypond             # Text-to-sheet-music engraver: scripts can turn notes into PDF scores
 
     # ----- Linux-native audio plugins (LV2/VST, load inside Reaper) -----
     lsp-plugins
@@ -90,12 +104,15 @@
     surge-xt
     vital
     dragonfly-reverb
+    sfizz-ui             # SFZ sample player (LV2 + VST3) for the orchestral/piano libraries
+                         # in ~/Music/Samples. Plain `sfizz` has no plugins, only the library.
 
     # ----- Reaper scripting -----
     # Python for ReaScript: lets you automate Reaper with Python code.
-    # After rebuild, point Reaper at this binary:
-    #   Options > Preferences > Plug-ins > ReaScript > Python path:
-    #   /run/current-system/sw/bin/python3
+    # Reaper wants the Python *library*, not the python3 program:
+    #   Options > Preferences > Plug-ins > ReaScript >
+    #   Custom path: /run/current-system/sw/lib   DLL/dylib: libpython3.14.so
+    # (set in ~/.config/REAPER/reaper.ini on 2026-10-08)
     # hiPrio so this env, not the bare python313 runtime, owns `python3`.
     # PDF stack is pinned in pkgs/python-pymupdf.nix (nixpkgs is older).
     (lib.hiPrio (python3.withPackages (ps:
