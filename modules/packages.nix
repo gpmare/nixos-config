@@ -49,6 +49,10 @@
     # Mail client. Plain package — no HM account wiring, no policies.
     # Updates via nixpkgs (`make update` + rebuild), not the in-app updater.
     thunderbird
+    # Proton Mail: the official desktop app for the encrypted Proton inbox.
+    # (Proton Mail Bridge, for using Proton inside Thunderbird, is a separate
+    # package — protonmail-bridge — not installed.)
+    protonmail-desktop
     libreoffice
     freecad
     vlc                   # Universal audio/video player
