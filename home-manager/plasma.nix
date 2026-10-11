@@ -16,6 +16,15 @@
   programs.plasma = {
     enable = true;
     overrideConfig = false;
+
+    # AC: never DPMS-off the display (Grok Bot drops its remote-exec helper
+    # ~4 min after the display turns off), but dim after 5 min idle to limit
+    # heat/burn-in. Plasma 6 dims to a fixed fraction of current brightness;
+    # there is no dim-level key. Battery/LowBattery stay at Plasma defaults.
+    powerdevil.AC = {
+      turnOffDisplay.idleTimeout = "never";
+      dimDisplay = { enable = true; idleTimeout = 300; };
+    };
     # Super-tap stays Kickoff (Plasma default). Super+Alt hold/double-tap
     # is whisper-flow-hotkey — Plasma fires modifier-only Super on *release*
     # only if no other key was pressed, so the chord does not open Kickoff.
