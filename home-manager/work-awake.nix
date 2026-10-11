@@ -16,6 +16,10 @@
 # behaviour apply: block only while an agent runs, and a closed lid (not
 # docked) drops the block and suspends, so a laptop in a bag doesn't drain.
 #
+# Auto-lock: on AC (and always on the battery-less nucbox) the service sets
+# kscreenlockerrc [Daemon] Autolock=false; on battery Autolock=true.
+# plasma-manager does not manage kscreenlocker, so nothing fights this.
+#
 # Process names: the Grok Bot desktop app's process is `grok-bot`, not
 # `grok`, so the old list never matched it (2026-10-11 diagnosis).
 
@@ -24,7 +28,7 @@
 let
   work-awake = pkgs.writeShellApplication {
     name = "work-awake";
-    runtimeInputs = with pkgs; [ systemd procps coreutils ];
+    runtimeInputs = with pkgs; [ systemd procps coreutils kdePackages.kconfig kdePackages.qttools ];
     text = ''
       set -euo pipefail
 
@@ -33,6 +37,18 @@ let
       WORK_PROCS=(claude grok grok-bot claude-desktop hermes)
 
       inhibit_pid=""
+      lock_state=""
+
+      # Auto-lock follows power source: off on AC, on on battery. The Grok
+      # Bot app kills its remote-exec helper ~3-5 min after the session
+      # locks, so a locked machine is unreachable (2026-10-11). Only writes
+      # on change. LockOnResume is left alone (stays true).
+      set_autolock() {
+        [[ "$lock_state" == "$1" ]] && return 0
+        kwriteconfig6 --file kscreenlockerrc --group Daemon --key Autolock "$1" || return 0
+        qdbus org.freedesktop.ScreenSaver /ScreenSaver configure >/dev/null 2>&1 || true
+        lock_state="$1"
+      }
 
       has_work() {
         local p
@@ -102,16 +118,20 @@ let
         # denied while we held the inhibitor, and USB mice can wake the
         # machine without firing lid again.
         if on_ac; then
+          set_autolock false
           start_inhibit
         elif lid_closed; then
+          set_autolock true
           stop_inhibit
           if ! docked; then
             systemctl suspend || true
             sleep 8
           fi
         elif has_work; then
+          set_autolock true
           start_inhibit
         else
+          set_autolock true
           stop_inhibit
         fi
         sleep 2
