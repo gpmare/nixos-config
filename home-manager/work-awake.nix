@@ -10,9 +10,14 @@
 # inhibitor is dropped and PowerDevil's normal idle suspend can fire again.
 # The screen may still blank (fine for remote control).
 #
-# Lid close is not idle: if the lid is shut and the machine is not docked,
-# the inhibitor is dropped and suspend is requested. Otherwise a laptop in
-# a bag stays fully on (Grok/Claude almost always running) and drains.
+# On mains power (or a machine with no battery, e.g. the nucbox) the block is
+# held ALWAYS, agent running or not, and lid close does not suspend: the
+# box stays reachable from the phone. Only on battery does the old
+# behaviour apply: block only while an agent runs, and a closed lid (not
+# docked) drops the block and suspends, so a laptop in a bag doesn't drain.
+#
+# Process names: the Grok Bot desktop app's process is `grok-bot`, not
+# `grok`, so the old list never matched it (2026-10-11 diagnosis).
 
 { pkgs, ... }:
 
@@ -25,7 +30,7 @@ let
 
       # Processes that mean "I'm still working" (comm name, pgrep -x).
       # Add names here if you use other long-lived agent CLIs.
-      WORK_PROCS=(claude grok)
+      WORK_PROCS=(claude grok grok-bot claude-desktop hermes)
 
       inhibit_pid=""
 
@@ -48,6 +53,19 @@ let
       }
 
       lid_closed() { logind_bool LidClosed; }
+
+      # True on mains power, or when there is no battery at all (desktop).
+      on_ac() {
+        local bat=0 ps
+        for ps in /sys/class/power_supply/*; do
+          [[ -r "$ps/type" ]] || continue
+          case "$(cat "$ps/type")" in
+            Mains) [[ "$(cat "$ps/online" 2>/dev/null)" == 1 ]] && return 0 ;;
+            Battery) bat=1 ;;
+          esac
+        done
+        [[ $bat -eq 0 ]]
+      }
       docked() { logind_bool Docked; }
 
       start_inhibit() {
@@ -58,7 +76,7 @@ let
         systemd-inhibit \
           --what=sleep \
           --who=work-awake \
-          --why="Active Claude/Grok session" \
+          --why="On AC power or active agent session" \
           --mode=block \
           sleep infinity &
         inhibit_pid=$!
@@ -83,7 +101,9 @@ let
         # request suspend ourselves — the lid event may already have been
         # denied while we held the inhibitor, and USB mice can wake the
         # machine without firing lid again.
-        if lid_closed; then
+        if on_ac; then
+          start_inhibit
+        elif lid_closed; then
           stop_inhibit
           if ! docked; then
             systemctl suspend || true

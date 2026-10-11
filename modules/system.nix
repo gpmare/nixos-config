@@ -110,7 +110,7 @@
   #  see home-manager/work-awake.nix, which blocks *idle* sleep
   #  while Claude/Grok sessions are running, but drops that block
   #  when the lid closes so a laptop actually suspends in a bag.
-  #  Screen blanking is fine.
+  #  Screen blanking is fine. On AC work-awake holds the block always.
   #
   #  HandleLidSwitch*: PowerDevil claims the lid via a logind
   #  inhibitor while a Plasma session is up; these are the fallback
@@ -122,7 +122,7 @@
     HandleSuspendKey = "ignore";
     HandleHibernateKey = "ignore";
     HandleLidSwitch = "suspend";
-    HandleLidSwitchExternalPower = "suspend";
+    HandleLidSwitchExternalPower = "lock";  # plugged in: stay reachable
     HandleLidSwitchDocked = "ignore";
   };
 

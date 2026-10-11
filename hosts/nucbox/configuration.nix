@@ -29,4 +29,16 @@
   # world); pkgs.ollama-rocm is the prebuilt attr.
   services.ollama.package = pkgs.ollama-rocm;
   services.ollama.rocmOverrideGfx = "11.0.3";
+
+  # ============================================================
+  #  Never sleep — always-on desktop (phone-driven agents, Hermes).
+  # ============================================================
+  # Belt and braces on top of work-awake: even if PowerDevil or a stray
+  # `systemctl suspend` asks, systemd refuses. Screen still blanks/locks.
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
+  };
 }
