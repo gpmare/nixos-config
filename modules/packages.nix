@@ -108,6 +108,19 @@
     surge-xt
     vital
     dragonfly-reverb
+    # Round 2 (HGM Music, approved 2026-10-13)
+    dexed                # FM synth (DX7-style)
+    odin2                # Analogue-style synth
+    cardinal             # VCV Rack modular as a plugin (incl. granular/"Texture Synthesizer")
+    chow-tape-model      # ChowTape: analogue tape saturation
+    airwindows           # Airwindows Consolidated (Galactic etc.)
+    zam-plugins          # ZamPlugins compressors/EQs
+    # Not in nixpkgs, so skipped: ChowMatrix, DPF-Plugins (MaGigaverb), PaulXStretch.
+
+    # ----- Audio analysis -----
+    sonic-visualiser     # Look at audio: spectrograms, chords (with Vamp plugins)
+    vamp-plugin-sdk      # Vamp SDK + example plugins
+    # Not in nixpkgs: NNLS-Chroma/Chordino, sonic-annotator.
     sfizz-ui             # SFZ sample player (LV2 + VST3) for the orchestral/piano libraries
                          # in ~/Music/Samples. Plain `sfizz` has no plugins, only the library.
 
@@ -140,4 +153,20 @@
     fluidsynth        # Software MIDI synth (plays .mid files as real instruments)
     soundfont-generaluser-gs  # High-quality GM soundfont for fluidsynth
   ];
+
+  # Where plugin hosts (REAPER, Sonic Visualiser, ...) look for plugins.
+  environment.sessionVariables = let
+    dirs = d: lib.concatStringsSep ":" [
+      "$HOME/.nix-profile/lib/${d}"
+      "/etc/profiles/per-user/$USER/lib/${d}"
+      "/run/current-system/sw/lib/${d}"
+    ];
+  in {
+    LV2_PATH = dirs "lv2";
+    CLAP_PATH = dirs "clap";
+    VST3_PATH = dirs "vst3";
+    VST_PATH = dirs "vst";
+    LADSPA_PATH = dirs "ladspa";
+    VAMP_PATH = dirs "vamp";
+  };
 }
