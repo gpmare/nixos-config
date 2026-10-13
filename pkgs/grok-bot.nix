@@ -1,7 +1,12 @@
 # Official Grok Bot Linux .deb. Not in nixpkgs.
 # Product: https://x.ai/bot  CDN: downloads.cursor.com
 #
-# Bump: poll the stable manifest, then update version / buildId / hashes.
+# Auto-bumped: every midnight the nixos-upgrade job (modules/auto-upgrade.nix)
+# runs pkgs/update-grok-bot.sh, which polls the stable manifests, rewrites
+# version / buildId / hashes below, and keeps the change ONLY if the package
+# builds (otherwise it reverts). That edit is local and uncommitted.
+# Manual bump (to commit one): `bash pkgs/update-grok-bot.sh` (or --check),
+# or by hand: poll the stable manifest, then update version / buildId / hashes.
 #   curl -fsSL https://api2.cursor.sh/updates/api/download/stable/linux-x64/sand
 #   curl -fsSL https://api2.cursor.sh/updates/api/download/stable/linux-arm64/sand
 # Prefetch each debUrl, paste the SRI into sources.<system>.hash.

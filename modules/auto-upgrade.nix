@@ -7,6 +7,13 @@
 #      files), it is skipped and tonight's build uses the local checkout.
 #   2. `nix flake update` every input except `noAutoUpdate` — a LOCAL lock
 #      bump that is never committed.
+#   3. Grok Bot: pkgs/update-grok-bot.sh asks the Grok Bot update server for
+#      the newest version. If it is newer, it rewrites pkgs/grok-bot.nix and
+#      test-builds it; if that build fails it puts the old file back, so a
+#      broken release never reaches the machine. Like flake.lock, this is a
+#      LOCAL edit that is never committed or pushed (no GitHub login needed,
+#      and the two machines can't race each other). Step 1 throws it away the
+#      next night before pulling, then step 3 re-applies it.
 # Then, as root, `nixos-rebuild switch` builds nixosConfigurations.<hostname>
 # (hostname == attr: nucbox / dell). A failed build leaves the current
 # generation running; check with `systemctl status nixos-upgrade`.
@@ -17,7 +24,7 @@
 # latest inputs each night. Lock changes worth keeping must be committed and
 # pushed — an uncommitted flake.lock edit is discarded at midnight.
 #
-# Does NOT bump: pinned local drvs (Claude Desktop / Grok Bot .debs, Pomotroid
+# Does NOT bump: pinned local drvs (Claude Desktop .deb, Pomotroid
 # AppImage, claude-code-manifest.json), the curl-installed Grok CLI, mise
 # runtimes, Hermes Docker images, or inputs in `noAutoUpdate`.
 #
@@ -43,10 +50,11 @@ let
 
   prep = pkgs.writeShellScript "nixos-upgrade-prep" ''
     set -u
-    export PATH=${lib.makeBinPath [ config.nix.package pkgs.git pkgs.jq pkgs.coreutils pkgs.gnugrep ]}
+    export PATH=${lib.makeBinPath [ config.nix.package pkgs.git pkgs.jq pkgs.coreutils pkgs.gnugrep pkgs.curl pkgs.gnused pkgs.gawk pkgs.bash ]}
     cd ${lib.escapeShellArg flakeDir}
 
-    git checkout -- flake.lock || true
+    # Drop last night's local-only edits so the pull below can fast-forward.
+    git checkout -- flake.lock pkgs/grok-bot.nix || true
     if git fetch --quiet ${repoUrl} main:refs/remotes/origin/main \
        && git merge --ff-only --quiet origin/main; then
       echo "nixos-upgrade: at $(git rev-parse --short HEAD) (origin/main)"
@@ -58,6 +66,10 @@ let
       | grep -vxF ${lib.concatMapStringsSep " " (i: "-e ${i}") noAutoUpdate} || true)
     # shellcheck disable=SC2086
     nix flake update --flake . $inputs
+
+    # Grok Bot auto-bump (only kept if it builds; never fails the upgrade).
+    GROK_BOT_HOST=${config.networking.hostName} bash ./pkgs/update-grok-bot.sh \
+      || echo "nixos-upgrade: Grok Bot bump failed; keeping current version"
   '';
 in
 {
