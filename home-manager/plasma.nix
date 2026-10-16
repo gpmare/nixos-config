@@ -25,6 +25,19 @@
       turnOffDisplay.idleTimeout = "never";
       dimDisplay = { enable = true; idleTimeout = 300; };
     };
+    # Pitch-black desktop and lock screen ("switched-off screen" look).
+    workspace.wallpaperPlainColor = "0,0,0";
+    kscreenlocker.appearance.wallpaperPlainColor = "0,0,0";
+
+    # Live CPU / RAM / GPU % on the existing panel (waybar-style). The panel
+    # itself is unmanaged (declaring `panels` would wipe it), so this script
+    # only appends three text-only System Monitor widgets next to the tray
+    # if they are not already there. gpu/all/usage works on Intel and AMD.
+    startup.desktopScript."sysmon_panel_widgets" = {
+      text = builtins.readFile ./plasma-sysmon.js;
+      priority = 8;
+    };
+
     # Super-tap stays Kickoff (Plasma default). Super+Alt hold/double-tap
     # is whisper-flow-hotkey — Plasma fires modifier-only Super on *release*
     # only if no other key was pressed, so the chord does not open Kickoff.
