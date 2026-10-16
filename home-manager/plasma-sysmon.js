@@ -1,18 +1,24 @@
+// Idempotent: adds compact CPU/RAM/GPU text widgets to the tray panel and
+// (re)applies short labels on existing ones. Never touches the system tray.
 const want = [["cpu/all/usage","CPU"],["memory/physical/usedPercent","RAM"],["gpu/all/usage","GPU"]];
+function label(w, id, name) {
+  w.currentConfigGroup = ["Appearance"];
+  w.writeConfig("chartFace","org.kde.ksysguard.textonly");
+  w.writeConfig("title",name);
+  w.writeConfig("showTitle",false);
+  w.currentConfigGroup = ["Sensors"];
+  w.writeConfig("highPrioritySensorIds", JSON.stringify([id]));
+  const l = {}; l[id] = name;
+  w.writeConfig("sensorLabels", JSON.stringify(l));
+}
 panels().forEach(p => {
   if (!p.widgets().some(w => w.type == "org.kde.plasma.systemtray")) return;
-  const have = p.widgets("org.kde.plasma.systemmonitor").map(w => { w.currentConfigGroup=["Sensors"]; return w.readConfig("highPrioritySensorIds",""); }).join(" ");
+  const existing = p.widgets("org.kde.plasma.systemmonitor");
   const added = [];
-  want.forEach(([id,title]) => {
-    if (have.indexOf(id) >= 0) return;
-    const w = p.addWidget("org.kde.plasma.systemmonitor");
-    w.currentConfigGroup = ["Appearance"];
-    w.writeConfig("chartFace","org.kde.ksysguard.textonly");
-    w.writeConfig("title",title);
-    w.writeConfig("showTitle",true);
-    w.currentConfigGroup = ["Sensors"];
-    w.writeConfig("highPrioritySensorIds", JSON.stringify([id]));
-    added.push(w.id);
+  want.forEach(([id,name]) => {
+    let w = existing.find(x => { x.currentConfigGroup=["Sensors"]; return String(x.readConfig("highPrioritySensorIds","")).indexOf(id) >= 0; });
+    if (!w) { w = p.addWidget("org.kde.plasma.systemmonitor"); added.push(w.id); }
+    label(w, id, name);
   });
   if (!added.length) return;
   p.currentConfigGroup = ["General"];
