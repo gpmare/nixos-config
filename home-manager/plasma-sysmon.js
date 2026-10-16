@@ -1,15 +1,16 @@
 // Idempotent: adds compact CPU/RAM/GPU text widgets to the tray panel and
 // (re)applies short labels on existing ones. Never touches the system tray.
+// Labels live in [Configuration][SensorLabels] as plain key=value (not JSON).
 const want = [["cpu/all/usage","CPU"],["memory/physical/usedPercent","RAM"],["gpu/all/usage","GPU"]];
 function label(w, id, name) {
   w.currentConfigGroup = ["Appearance"];
   w.writeConfig("chartFace","org.kde.ksysguard.textonly");
   w.writeConfig("title",name);
-  w.writeConfig("showTitle",false);
+  w.writeConfig("showTitle",true);
   w.currentConfigGroup = ["Sensors"];
   w.writeConfig("highPrioritySensorIds", JSON.stringify([id]));
-  const l = {}; l[id] = name;
-  w.writeConfig("sensorLabels", JSON.stringify(l));
+  w.currentConfigGroup = ["SensorLabels"];
+  w.writeConfig(id, name);
 }
 panels().forEach(p => {
   if (!p.widgets().some(w => w.type == "org.kde.plasma.systemtray")) return;
