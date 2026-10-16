@@ -134,6 +134,11 @@
   #  MongoDB — run as a system service (data in /var/db/mongodb)
   # ============================================================
   services.mongodb.enable = true;
+  # Installed but NOT started at boot: it was running all the time for no
+  # reason. The template, hgm-platform-frontend and tselio projects use it, so
+  # start it when you need it with `sudo systemctl start mongodb`
+  # (and `sudo systemctl stop mongodb` when done).
+  systemd.services.mongodb.wantedBy = lib.mkForce [ ];
 
   # Raise the open-file limit for mongod. The nixpkgs module sets no
   # LimitNOFILE, so systemd's default applies — soft 1024, hard 524288 — and
