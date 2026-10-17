@@ -60,4 +60,8 @@
   #  different release must set its own value in its configuration.nix.
   # ============================================================
   system.stateVersion = lib.mkDefault "26.05";
+
+  # Compressed swap in RAM: squeezes more out of memory before touching
+  # the (slower, encrypted) disk swap. Both machines.
+  zramSwap.enable = true;
 }

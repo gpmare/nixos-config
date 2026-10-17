@@ -5,6 +5,7 @@
 
 {
   environment.systemPackages = with pkgs; [
+    lm_sensors  # `sensors` command: CPU/GPU temperatures and fan speeds
     # ----- General desktop -----
     vim
     tmux                  # Terminal multiplexer — sessions survive disconnects/restarts
