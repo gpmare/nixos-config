@@ -62,7 +62,7 @@
     stremio-linux-shell
     # WhatsApp / YouTube Music: no solid native clients on nixpkgs right now
     # (karere was glitchy; pear-desktop threw missing-package errors). Use the
-    # Brave web-app launchers in home-manager/web-apps.nix instead.
+    # Chromium web-app launchers in home-manager/web-apps.nix instead.
     kdePackages.kate
     termius              # SSH client (GUI). Unfree; already allowed in system.nix.
     # Pomotroid: not in nixpkgs — local AppImage package under pkgs/.

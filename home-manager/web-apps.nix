@@ -1,5 +1,5 @@
 # Lightweight "desktop apps" for sites with no good native NixOS client.
-# Brave is the default browser; --app= opens a frameless PWA-style window.
+# Opened in Chromium (Brave retired for these); --app= opens a frameless PWA-style window.
 
 { ... }:
 
@@ -8,7 +8,7 @@
     name = "Google Calendar";
     genericName = "Calendar";
     comment = "Google Calendar (web app)";
-    exec = "brave --app=https://calendar.google.com/calendar --class=GoogleCalendar --name=GoogleCalendar";
+    exec = "chromium --app=https://calendar.google.com/calendar --class=GoogleCalendar --name=GoogleCalendar";
     icon = "x-office-calendar";
     categories = [ "Office" "Calendar" ];
     startupNotify = true;
@@ -20,7 +20,7 @@
     name = "YouTube Music";
     genericName = "Music";
     comment = "YouTube Music (web app)";
-    exec = "brave --app=https://music.youtube.com --class=YouTubeMusic --name=YouTubeMusic";
+    exec = "chromium --app=https://music.youtube.com --class=YouTubeMusic --name=YouTubeMusic";
     icon = "multimedia-audio-player";
     categories = [ "AudioVideo" "Audio" "Player" ];
     startupNotify = true;
@@ -33,7 +33,7 @@
     name = "WhatsApp";
     genericName = "Messenger";
     comment = "WhatsApp Web (web app)";
-    exec = "brave --app=https://web.whatsapp.com --class=WhatsApp --name=WhatsApp";
+    exec = "chromium --app=https://web.whatsapp.com --class=WhatsApp --name=WhatsApp";
     icon = "user-available";
     categories = [ "Network" "InstantMessaging" ];
     startupNotify = true;
