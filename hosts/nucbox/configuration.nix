@@ -12,6 +12,9 @@
     # Hermes Agent gateway (Docker). One gateway only: a second copy on
     # another machine would log into the same chat bots twice.
     ../../modules/hermes.nix
+
+    # Learning-platform autograder (rootless podman sandbox).
+    ../../modules/learn-grader.nix
   ];
 
   # ============================================================

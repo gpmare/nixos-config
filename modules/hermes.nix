@@ -26,7 +26,8 @@ in
   virtualisation.oci-containers = {
     backend = "docker";
     containers.hermes = {
-      image = "nousresearch/hermes-agent:latest";
+      # Pinned 2026-10-21. To update: docker pull, then replace the digest.
+      image = "nousresearch/hermes-agent@sha256:b891dca7475abc34f88eec929b51773137b43b77df344265b004fc815cee6152";
       autoStart = true;
       cmd = [ "gateway" "run" ];
       ports = [
