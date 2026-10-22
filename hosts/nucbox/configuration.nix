@@ -84,6 +84,16 @@
     X-KDE-autostart-phase=2
   '';
 
+  # Start Claude Desktop on login too.
+  home-manager.users.gpmare.xdg.configFile."autostart/claude-desktop.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Claude
+    Exec=claude-desktop
+    Icon=claude
+    X-KDE-autostart-phase=2
+  '';
+
   # --- 4. Lock down remote login (SSH) -------------------------------
   # Keys only, no passwords, no root. And only over Tailscale, not the
   # home Wi-Fi. The Dell's key is allowed in.
