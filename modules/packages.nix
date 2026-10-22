@@ -1,7 +1,7 @@
 # System-wide applications. Anything you want on $PATH for all users
 # goes here. User-specific config lives in home-manager/gpmare.nix.
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
@@ -98,7 +98,8 @@
     usbutils             # lsusb: shows whether a USB device (piano, interface) is detected
 
     # ----- Sheet music / notation -----
-    musescore            # MuseScore 4: write and play back sheet music, exports MIDI/MusicXML
+    # From the pinned nixpkgs-musescore input (see flake.nix for why/when to drop).
+    inputs.nixpkgs-musescore.legacyPackages.${pkgs.stdenv.hostPlatform.system}.musescore  # MuseScore 4: write and play back sheet music, exports MIDI/MusicXML
                          # Muse Sounds (MuseHub) is not in nixpkgs, so not installed here.
     lilypond             # Text-to-sheet-music engraver: scripts can turn notes into PDF scores
 

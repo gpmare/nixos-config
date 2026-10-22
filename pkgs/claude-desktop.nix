@@ -59,6 +59,7 @@
   OVMF,
   pango,
   perl,
+  pipewire,
   qemu,
   systemd,
   trash-cli,
@@ -118,6 +119,7 @@ let
     nspr
     nss
     pango
+    pipewire # libpipewire-0.3 for claude-native-binding.node (3.x+)
     stdenv.cc.cc.lib
     systemd
     vulkan-loader

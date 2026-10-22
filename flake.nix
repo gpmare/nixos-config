@@ -37,6 +37,15 @@
     # Own nixpkgs pin — do not `follows` ours; the flake is uv2nix-locked
     # and breaks if nixpkgs is swapped.
     hermes-agent.url = "github:NousResearch/hermes-agent";
+
+    # MuseScore pin. nixpkgs of 2026-10-20 ships musescore 4.7.5 that fails
+    # to compile (Qt 6.12 / newer GCC), and one broken package would fail the
+    # whole nightly upgrade. This input is pinned to the last nixpkgs where it
+    # built, is listed in noAutoUpdate (modules/auto-upgrade.nix), and
+    # modules/packages.nix takes musescore from it.
+    # Remove it (and the noAutoUpdate entry, and use plain `musescore` again)
+    # once `nix build nixpkgs#musescore` succeeds on current nixos-unstable.
+    nixpkgs-musescore.url = "github:NixOS/nixpkgs/494ce7fd23ff6a5dff39e1fb11e9b6f2ac74bf25";
   };
 
   # ============================================================

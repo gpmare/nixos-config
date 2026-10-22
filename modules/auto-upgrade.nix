@@ -14,6 +14,11 @@
 #      LOCAL edit that is never committed or pushed (no GitHub login needed,
 #      and the two machines can't race each other). Step 1 throws it away the
 #      next night before pulling, then step 3 re-applies it.
+#   4. Claude Code and Claude Desktop: pkgs/update-claude-code.sh and
+#      pkgs/update-claude-desktop.sh do the same for
+#      pkgs/claude-code-manifest.json (Anthropic's release manifest) and
+#      pkgs/claude-desktop.nix (Anthropic's apt repo index). Local, never
+#      committed, kept only if the test build passes.
 # Then, as root, `nixos-rebuild switch` builds nixosConfigurations.<hostname>
 # (hostname == attr: nucbox / dell). A failed build leaves the current
 # generation running; check with `systemctl status nixos-upgrade`.
@@ -24,8 +29,7 @@
 # latest inputs each night. Lock changes worth keeping must be committed and
 # pushed — an uncommitted flake.lock edit is discarded at midnight.
 #
-# Does NOT bump: pinned local drvs (Claude Desktop .deb, Pomotroid
-# AppImage, claude-code-manifest.json), the curl-installed Grok CLI, mise
+# Does NOT bump: the Pomotroid AppImage, the curl-installed Grok CLI, mise
 # runtimes, Hermes Docker images, or inputs in `noAutoUpdate`.
 #
 # `nixos-rebuild --upgrade` is a no-op on flakes (channels only).
@@ -38,7 +42,8 @@ let
 
   # Bumped on purpose (then built), never by the nightly job:
   #   hermes-agent — pkgs/hermes-desktop.nix patches upstream's build.
-  noAutoUpdate = [ "hermes-agent" ];
+  #   nixpkgs-musescore — known-good MuseScore pin (see modules/packages.nix).
+  noAutoUpdate = [ "hermes-agent" "nixpkgs-musescore" ];
 
   # The rebuild runs as root on a repo owned by ${username}; Nix's libgit2
   # refuses that ("not owned by current user") unless the path is marked
@@ -54,7 +59,8 @@ let
     cd ${lib.escapeShellArg flakeDir}
 
     # Drop last night's local-only edits so the pull below can fast-forward.
-    git checkout -- flake.lock pkgs/grok-bot.nix || true
+    git checkout -- flake.lock pkgs/grok-bot.nix \
+      pkgs/claude-code-manifest.json pkgs/claude-desktop.nix || true
     if git fetch --quiet ${repoUrl} main:refs/remotes/origin/main \
        && git merge --ff-only --quiet origin/main; then
       echo "nixos-upgrade: at $(git rev-parse --short HEAD) (origin/main)"
@@ -70,6 +76,12 @@ let
     # Grok Bot auto-bump (only kept if it builds; never fails the upgrade).
     GROK_BOT_HOST=${config.networking.hostName} bash ./pkgs/update-grok-bot.sh \
       || echo "nixos-upgrade: Grok Bot bump failed; keeping current version"
+
+    # Claude Code + Claude Desktop auto-bumps (same rules as Grok Bot).
+    CLAUDE_HOST=${config.networking.hostName} bash ./pkgs/update-claude-code.sh \
+      || echo "nixos-upgrade: Claude Code bump failed; keeping current version"
+    CLAUDE_HOST=${config.networking.hostName} bash ./pkgs/update-claude-desktop.sh \
+      || echo "nixos-upgrade: Claude Desktop bump failed; keeping current version"
   '';
 in
 {
