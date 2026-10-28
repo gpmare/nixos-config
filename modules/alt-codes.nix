@@ -56,6 +56,7 @@ in
       Type = "simple";
       User = username;
       SupplementaryGroups = [ "input" "uinput" ];
+      Environment = "ALT_CODES_SYSTEM_COMPOSE=${pkgs.libx11}/share/X11/locale/en_US.UTF-8/Compose";
       ExecStart = "${alt-codes}/bin/alt-codes";
       Restart = "always";
       RestartSec = "1s";
