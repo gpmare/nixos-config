@@ -2,7 +2,7 @@
 # Always-on desktop: also runs the Hermes gateway container.
 # Shared config: ../common.nix. Hardware: ./hardware-configuration.nix.
 
-{ config, lib, pkgs, ... }:
+{ config, lib, options, pkgs, ... }:
 
 {
   imports = [
@@ -59,7 +59,12 @@
   # password as before, so plugging in a screen + keyboard always works.
   # One-time setup after rebuild: `sudo systemd-cryptenroll
   # --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-uuid/<uuid>` per disk.
-  boot.initrd.systemd.enable = true;
+  # Newer nixpkgs (late Oct 2026) removed the old scripted initrd: the
+  # systemd one is the only one and the option is gone (setting it is an
+  # error). Older nixpkgs still needs it switched on for TPM unlock. So
+  # set it only while the option still exists (works on both).
+  boot.initrd.systemd.enable =
+    lib.mkIf (options.boot.initrd.systemd.enable.visible or true) true;
   boot.initrd.availableKernelModules = [ "tpm_crb" "tpm_tis" ];
   boot.initrd.luks.devices."luks-59050903-c8dd-4e51-ae6a-64f23eede32d".crypttabExtraOpts =
     [ "tpm2-device=auto" ];   # root disk
