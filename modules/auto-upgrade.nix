@@ -19,6 +19,8 @@
 #      pkgs/claude-code-manifest.json (Anthropic's release manifest) and
 #      pkgs/claude-desktop.nix (Anthropic's apt repo index). Local, never
 #      committed, kept only if the test build passes.
+#   5. Granola: pkgs/update-granola.sh does the same for pkgs/granola.nix
+#      (Granola's latest-mac.yml feed).
 # Then, as root, `nixos-rebuild switch` builds nixosConfigurations.<hostname>
 # (hostname == attr: nucbox / dell). A failed build leaves the current
 # generation running; check with `systemctl status nixos-upgrade`.
@@ -60,7 +62,7 @@ let
 
     # Drop last night's local-only edits so the pull below can fast-forward.
     git checkout -- flake.lock pkgs/grok-bot.nix \
-      pkgs/claude-code-manifest.json pkgs/claude-desktop.nix || true
+      pkgs/claude-code-manifest.json pkgs/claude-desktop.nix pkgs/granola.nix || true
     if git fetch --quiet ${repoUrl} main:refs/remotes/origin/main \
        && git merge --ff-only --quiet origin/main; then
       echo "nixos-upgrade: at $(git rev-parse --short HEAD) (origin/main)"
@@ -82,6 +84,10 @@ let
       || echo "nixos-upgrade: Claude Code bump failed; keeping current version"
     CLAUDE_HOST=${config.networking.hostName} bash ./pkgs/update-claude-desktop.sh \
       || echo "nixos-upgrade: Claude Desktop bump failed; keeping current version"
+
+    # Granola (macOS dmg repackaged; same rules).
+    GRANOLA_HOST=${config.networking.hostName} bash ./pkgs/update-granola.sh \
+      || echo "nixos-upgrade: Granola bump failed; keeping current version"
   '';
 in
 {

@@ -67,6 +67,8 @@
     termius              # SSH client (GUI). Unfree; already allowed in system.nix.
     # Pomotroid: not in nixpkgs — local AppImage package under pkgs/.
     (callPackage ../pkgs/pomotroid.nix { })
+    # Granola: macOS build repackaged on Linux Electron (pkgs/granola.nix).
+    (callPackage ../pkgs/granola.nix { })
     # Grok Bot: not in nixpkgs — official Linux .deb under pkgs/.
     (callPackage ../pkgs/grok-bot.nix { })
 
