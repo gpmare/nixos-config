@@ -1,4 +1,4 @@
-# ArtCraft office apps (WordCraft, GridCraft, DeckCraft): upstream Linux
+# ArtCraft office apps (WordCraft, GridCraft, DeckCraft, PdfCraft): upstream Linux
 # x86_64 release tarballs from github.com/storytold/<app>. Pure-Rust binaries
 # that dlopen their windowing/GPU libs, so we patchelf + add those to
 # LD_LIBRARY_PATH. nixpkgs has older wordcraft/gridcraft and no deckcraft.
@@ -11,6 +11,7 @@ let
     wordcraft = { version = "0.14.0"; hash = "sha256-MBDaPTUtlSVuyaF6A5ZigKHUG6CdDr5WmvIwkti2SYc="; };
     gridcraft = { version = "0.15.0"; hash = "sha256-aBD4znOUtafN+vOYOCV7Y4Tc65+DJQJNR124le5Z2qo="; };
     deckcraft = { version = "0.14.1"; hash = "sha256-6Gx/oOy1XxpVPuQluT3P3IBrezeY8nK0Hx0f90rFwSo="; };
+    pdfcraft  = { version = "0.17.0"; hash = "sha256-+YFKegr3e5Ba26HDB5yu3uU3WGeXBDz1r5UDkU9qvsU="; };
   };
   runtimeLibs = [ alsa-lib dbus libGL vulkan-loader wayland libxkbcommon
     libX11 libXcursor libXi libxcb ];
