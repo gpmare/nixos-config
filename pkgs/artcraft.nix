@@ -15,6 +15,7 @@ let
   };
   runtimeLibs = [ alsa-lib dbus libGL vulkan-loader wayland libxkbcommon
     libX11 libXcursor libXi libxcb ];
+  extraMime = import ./artcraft-mime.nix;
   mk = pname: { version, hash }: stdenv.mkDerivation {
     inherit pname version;
     src = fetchurl {
@@ -25,6 +26,11 @@ let
     buildInputs = [ alsa-lib dbus stdenv.cc.cc.lib ];
     installPhase = ''
       mkdir -p $out; cp -r bin share $out/
+      # Also claim the extra types we default to this app (modules/office-defaults.nix).
+      d=$out/share/applications/ai.storyteller.${pname}.desktop
+      sed -i 's|^MimeType=.*|&${lib.concatMapStrings (t: t + ";") (extraMime.${pname} or [ ])}|' $d
+      # de-duplicate the list
+      awk -F= -v OFS== '/^MimeType=/{n=split($2,a,";");o="";delete seen;for(i=1;i<=n;i++)if(a[i]!=""&&!seen[a[i]]++)o=o a[i]";";$2=o}1' $d > $d.tmp && mv $d.tmp $d
       for b in ${pname} ${pname}-cli; do
         wrapProgram $out/bin/$b --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath runtimeLibs}
       done
