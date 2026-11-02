@@ -21,6 +21,7 @@
 #      committed, kept only if the test build passes.
 #   5. Granola: pkgs/update-granola.sh does the same for pkgs/granola.nix
 #      (Granola's latest-mac.yml feed).
+#   6. ArtCraft: pkgs/update-artcraft.sh, same for pkgs/artcraft.nix (GitHub releases).
 # Then, as root, `nixos-rebuild switch` builds nixosConfigurations.<hostname>
 # (hostname == attr: nucbox / dell). A failed build leaves the current
 # generation running; check with `systemctl status nixos-upgrade`.
@@ -62,7 +63,7 @@ let
 
     # Drop last night's local-only edits so the pull below can fast-forward.
     git checkout -- flake.lock pkgs/grok-bot.nix \
-      pkgs/claude-code-manifest.json pkgs/claude-desktop.nix pkgs/granola.nix || true
+      pkgs/claude-code-manifest.json pkgs/claude-desktop.nix pkgs/granola.nix pkgs/artcraft.nix || true
     if git fetch --quiet ${repoUrl} main:refs/remotes/origin/main \
        && git merge --ff-only --quiet origin/main; then
       echo "nixos-upgrade: at $(git rev-parse --short HEAD) (origin/main)"
@@ -88,6 +89,10 @@ let
     # Granola (macOS dmg repackaged; same rules).
     GRANOLA_HOST=${config.networking.hostName} bash ./pkgs/update-granola.sh \
       || echo "nixos-upgrade: Granola bump failed; keeping current version"
+
+    # ArtCraft office apps (GitHub release tarballs; same rules).
+    ARTCRAFT_HOST=${config.networking.hostName} bash ./pkgs/update-artcraft.sh \
+      || echo "nixos-upgrade: ArtCraft bump failed; keeping current versions"
   '';
 in
 {
