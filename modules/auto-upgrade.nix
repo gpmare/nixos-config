@@ -90,7 +90,7 @@ let
     GRANOLA_HOST=${config.networking.hostName} bash ./pkgs/update-granola.sh \
       || echo "nixos-upgrade: Granola bump failed; keeping current version"
 
-    # ArtCraft office apps (GitHub release tarballs; same rules).
+    # ArtCraft apps (GitHub release tarballs; same rules).
     ARTCRAFT_HOST=${config.networking.hostName} bash ./pkgs/update-artcraft.sh \
       || echo "nixos-upgrade: ArtCraft bump failed; keeping current versions"
   '';

@@ -8,7 +8,8 @@ repo="$(cd "$(dirname "$0")/.." && pwd)"; file="$repo/pkgs/artcraft.nix"
 host="${ARTCRAFT_HOST:-$(hostname)}"
 backup=$(mktemp); cp "$file" "$backup"; changed=0
 trap 'cp "$backup" "$file"; rm -f "$backup"; echo "artcraft: reverted"' ERR
-for app in wordcraft gridcraft deckcraft pdfcraft; do
+apps=$(sed -nE 's/^    ([a-z]+) *= \{ version = .*/\1/p' "$file")
+for app in $apps; do
   new=$(curl -fsSL --retry 3 "https://api.github.com/repos/storytold/$app/releases/latest" | jq -r .tag_name | sed 's/^v//')
   [[ "$new" =~ ^[0-9]+(\.[0-9]+)+$ ]] || { echo "artcraft: $app odd tag ($new)"; continue; }
   cur=$(sed -nE "s/^    $app *= \{ version = \"([^\"]+)\".*/\1/p" "$file")
