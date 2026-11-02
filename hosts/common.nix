@@ -15,6 +15,7 @@
     ../modules/audio.nix
     ../modules/dev.nix
     ../modules/packages.nix
+    ../modules/office-defaults.nix
     ../modules/hermes-client.nix
     ../modules/whisper-flow.nix
     ../modules/alt-codes.nix
