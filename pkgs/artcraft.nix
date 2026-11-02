@@ -13,7 +13,7 @@ let
     gridcraft = { version = "0.15.0"; hash = "sha256-aBD4znOUtafN+vOYOCV7Y4Tc65+DJQJNR124le5Z2qo="; };
     deckcraft = { version = "0.14.1"; hash = "sha256-6Gx/oOy1XxpVPuQluT3P3IBrezeY8nK0Hx0f90rFwSo="; };
     pdfcraft  = { version = "0.17.0"; hash = "sha256-+YFKegr3e5Ba26HDB5yu3uU3WGeXBDz1r5UDkU9qvsU="; };
-    # Rest of the Craft suite (no default-app associations; see modules/office-defaults.nix).
+    # Rest of the Craft suite (defaults in modules/office-defaults.nix).
     photocraft = { version = "0.19.0"; hash = "sha256-EjOFsXMKzhjxK8D0lGBuakzT9KuJH5MDbNTnG4rqcPc="; };
     vectorcraft= { version = "0.20.0"; hash = "sha256-042D2eWf3PehAEFOIrMJQJT+T+LdQ6EF8EKXgBJhDoY="; };
     filmcraft  = { version = "0.16.0"; hash = "sha256-WIOQ7uXX4WNPBXlMT4d93ylJTZz3RAURHWfBbL4hWuk="; };
@@ -27,7 +27,6 @@ let
   runtimeLibs = [ alsa-lib dbus libGL vulkan-loader wayland libxkbcommon
     libX11 libXcursor libXi libxcb ];
   extraMime = import ./artcraft-mime.nix;
-  officeApps = [ "wordcraft" "gridcraft" "deckcraft" "pdfcraft" ];
   mk = pname: { version, hash }: stdenv.mkDerivation {
     inherit pname version;
     src = fetchurl {
@@ -41,11 +40,6 @@ let
       # Also claim the extra types we default to this app (modules/office-defaults.nix).
       d=$out/share/applications/ai.storyteller.${pname}.desktop
       sed -i 's|^MimeType=.*|&${lib.concatMapStrings (t: t + ";") (extraMime.${pname} or [ ])}|' $d
-      ${lib.optionalString (!builtins.elem pname officeApps) ''
-        # Non-office apps claim images/video/audio/SVG/PDF; drop that so installing
-        # them can't silently take over Gwenview/VLC/Elisa/FreeCAD/PdfCraft defaults.
-        sed -i '/^MimeType=/d' $d
-      ''}
       # de-duplicate the list
       awk -F= -v OFS== '/^MimeType=/{n=split($2,a,";");o="";delete seen;for(i=1;i<=n;i++)if(a[i]!=""&&!seen[a[i]]++)o=o a[i]";";$2=o}1' $d > $d.tmp && mv $d.tmp $d
       for b in ${pname} ${pname}-cli; do

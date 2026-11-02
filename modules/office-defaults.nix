@@ -1,4 +1,4 @@
-# Default apps for office files and PDFs: the ArtCraft apps (pkgs/artcraft.nix),
+# Default apps for office files, PDFs, images, vector, video, audio, CAD and layout: the ArtCraft apps (pkgs/artcraft.nix),
 # set broadly on purpose so Gerhard can test them and report bugs. The MIME list
 # lives in pkgs/artcraft-mime.nix (also added to each app's .desktop file).
 # LibreOffice stays installed and remains under right-click > Open With.
@@ -12,5 +12,8 @@ in
 {
   xdg.mime.enable = true;
   xdg.mime.defaultApplications =
-    to "wordcraft" // to "gridcraft" // to "deckcraft" // to "pdfcraft";
+    # Later wins on overlap; pdfcraft last so PDF never goes to VectorCraft.
+    to "photocraft" // to "lightcraft" // to "vectorcraft" // to "filmcraft"
+    // to "soundcraft" // to "cadcraft" // to "designcraft" // to "figcraft"
+    // to "wordcraft" // to "gridcraft" // to "deckcraft" // to "pdfcraft";
 }
