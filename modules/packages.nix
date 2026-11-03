@@ -47,12 +47,8 @@
     # Obsidian app + CLI (binaries: `obsidian`, `obsidian-cli`). CLI is on PATH
     # so AI agents can read/write the vault without the GUI.
     obsidian
-    # Mail client. Plain package — no HM account wiring, no policies.
-    # Updates via nixpkgs (`make update` + rebuild), not the in-app updater.
-    thunderbird
     # Proton Mail: the official desktop app for the encrypted Proton inbox.
-    # (Proton Mail Bridge, for using Proton inside Thunderbird, is a separate
-    # package — protonmail-bridge — not installed.)
+    # Default mail app (mailto: links open here). Thunderbird was removed.
     protonmail-desktop
 
     # Proton VPN: official desktop app (WireGuard via NetworkManager).
@@ -182,4 +178,7 @@
 
   # Proton VPN's WireGuard tunnels fail with strict reverse-path filtering.
   networking.firewall.checkReversePath = "loose";
+
+  # Email links (mailto:) open in Proton Mail.
+  xdg.mime.defaultApplications."x-scheme-handler/mailto" = "proton-mail.desktop";
 }
