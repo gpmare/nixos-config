@@ -54,6 +54,10 @@
     # (Proton Mail Bridge, for using Proton inside Thunderbird, is a separate
     # package — protonmail-bridge — not installed.)
     protonmail-desktop
+
+    # Proton VPN: official desktop app (WireGuard via NetworkManager).
+    # Turn it on when using open/public WiFi.
+    proton-vpn
     libreoffice
     freecad
     vlc                   # Universal audio/video player
@@ -175,4 +179,7 @@
     LADSPA_PATH = dirs "ladspa";
     VAMP_PATH = dirs "vamp";
   };
+
+  # Proton VPN's WireGuard tunnels fail with strict reverse-path filtering.
+  networking.firewall.checkReversePath = "loose";
 }
