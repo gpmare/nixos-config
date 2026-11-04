@@ -17,6 +17,7 @@
     ./web-apps.nix
     ./work-awake.nix
     ./plasma.nix
+    ./update.nix
   ];
 
   # ============================================================
