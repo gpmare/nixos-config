@@ -103,6 +103,14 @@
   services.tailscale.enable = true;
   services.tailscale.openFirewall = true;
 
+  # DNS via systemd-resolved, so Tailscale (MagicDNS, *.ts.net only) and
+  # Proton VPN (its own DNS on the tunnel) each get their own per-link DNS.
+  # Without this, tailscaled owns /etc/resolv.conf and forwards every lookup
+  # to Proton's 10.2.0.1 outside the tunnel -> timeouts -> "no internet"
+  # whenever Proton VPN is on.
+  services.resolved.enable = true;
+  networking.networkmanager.dns = "systemd-resolved";
+
   # ============================================================
   #  Power management (logind half)
   #  IdleAction=ignore: logind itself never suspends on idle.
