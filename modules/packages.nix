@@ -11,6 +11,8 @@
     tmux                  # Terminal multiplexer — sessions survive disconnects/restarts
     kitty                 # Default terminal (look configured in home-manager/kitty.nix)
     brave
+    # Brave Origin: stripped-down Brave (no rewards, wallet or AI). Default browser.
+    brave-origin
     vivaldi
     microsoft-edge
     # nixpkgs is on 2.1.287; pin Anthropic's current binary via the official
@@ -178,11 +180,21 @@
     VST_PATH = dirs "vst";
     LADSPA_PATH = dirs "ladspa";
     VAMP_PATH = dirs "vamp";
+    BROWSER = "brave-origin";   # default browser for terminal tools
   };
 
   # Proton VPN's WireGuard tunnels fail with strict reverse-path filtering.
   networking.firewall.checkReversePath = "loose";
 
-  # Email links (mailto:) open in Proton Mail.
-  xdg.mime.defaultApplications."x-scheme-handler/mailto" = "proton-mail.desktop";
+  # Email links (mailto:) open in Proton Mail; web links and pages open in
+  # Brave Origin (default browser).
+  xdg.mime.defaultApplications = {
+    "x-scheme-handler/mailto" = "proton-mail.desktop";
+    "text/html" = "brave-origin.desktop";
+    "application/xhtml+xml" = "brave-origin.desktop";
+    "x-scheme-handler/http" = "brave-origin.desktop";
+    "x-scheme-handler/https" = "brave-origin.desktop";
+    "x-scheme-handler/about" = "brave-origin.desktop";
+    "x-scheme-handler/unknown" = "brave-origin.desktop";
+  };
 }
