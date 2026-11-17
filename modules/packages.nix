@@ -55,6 +55,10 @@
     # Turn it on when using open/public WiFi.
     proton-vpn
     libreoffice
+
+    # Camunda Modeler: desktop editor for BPMN process diagrams (and DMN).
+    # .bpmn files are plain XML, so AI agents can read and edit them too.
+    camunda-modeler
     freecad
     vlc                   # Universal audio/video player
     # Attr is stremio-linux-shell; the desktop entry and binary are `stremio`.
