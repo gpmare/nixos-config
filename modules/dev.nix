@@ -109,7 +109,7 @@
 
     # ----- Browser automation -----
     # A real Chromium on PATH, needed by two things that will not use the
-    # Brave/Edge builds above:
+    # Brave Origin/Edge builds above:
     #   * chrome-devtools-mcp, which wants an explicit `-e /path/to/chromium`
     #     (see .mcp.json.example in the template repo)
     #   * Playwright's documented NixOS escape hatch, if the nix-ld route above

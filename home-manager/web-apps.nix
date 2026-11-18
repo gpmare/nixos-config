@@ -1,5 +1,5 @@
 # Lightweight "desktop apps" for sites with no good native NixOS client.
-# Opened in Chromium (Brave retired for these); --app= opens a frameless PWA-style window.
+# Opened in Chromium; --app= opens a frameless PWA-style window.
 
 { ... }:
 

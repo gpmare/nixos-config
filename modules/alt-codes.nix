@@ -9,8 +9,6 @@
 # ydotool (which only types ASCII on a US keymap — the old root cause).
 #
 # Side effect: the Menu key becomes the Compose key (xkb compose:menu).
-# Starts before whisper-flow-hotkey so that daemon sees Super+Alt on the
-# virtual keyboard.
 
 { lib, pkgs, username, ... }:
 
@@ -50,7 +48,7 @@ in
   systemd.services.alt-codes = {
     description = "Windows Alt+numpad codes (evdev → Compose)";
     wantedBy = [ "multi-user.target" ];
-    before = [ "display-manager.service" "whisper-flow-hotkey.service" ];
+    before = [ "display-manager.service" ];
     unitConfig.StartLimitIntervalSec = "0";
     serviceConfig = {
       Type = "simple";

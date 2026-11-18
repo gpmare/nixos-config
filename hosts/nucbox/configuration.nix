@@ -26,7 +26,7 @@
   # ============================================================
   #  Ollama GPU — AMD 780M (Phoenix / gfx1103)
   # ============================================================
-  # whisper-flow.nix enables ollama on CPU by default. This host has a
+  # modules/ollama.nix enables ollama on CPU by default. This host has a
   # Radeon 780M that ROCm does not detect as a supported gfx, so override
   # the LLVM target. Do not set nixpkgs.config.rocmSupport (rebuilds the
   # world); pkgs.ollama-rocm is the prebuilt attr.

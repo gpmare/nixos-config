@@ -10,7 +10,6 @@
     vim
     tmux                  # Terminal multiplexer — sessions survive disconnects/restarts
     kitty                 # Default terminal (look configured in home-manager/kitty.nix)
-    brave
     # Brave Origin: stripped-down Brave (no rewards, wallet or AI). Default browser.
     brave-origin
     vivaldi

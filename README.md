@@ -30,7 +30,7 @@ modules/
   dev.nix                              git + CLI tools + language runtimes
   packages.nix                         desktop + music apps
   hermes.nix / hermes-client.nix       Hermes gateway (nucbox) / desktop app + CLI
-  whisper-flow.nix                     local voice dictation
+  ollama.nix                           Ollama local LLM runtime
   alt-codes.nix                        Windows Alt+numpad codes
   claude-desktop.nix                   Claude Desktop
   axiom.nix                            PostgreSQL 18 for Axiom
@@ -39,7 +39,7 @@ home-manager/
   gpmare.nix                           user-level entry (imports siblings)
   kitty.nix                            terminal look + Plasma default
   plasma.nix                           Plasma settings
-  web-apps.nix                         Brave web-app desktop entries
+  web-apps.nix                         Chromium web-app desktop entries
   agent-instructions.md                shared Claude/Grok global rules
   brightness.nix                       Plasma DDC/CI brightness fix
   neovim.nix / vscode.nix / cursor.nix editors

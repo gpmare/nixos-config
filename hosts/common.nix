@@ -17,7 +17,7 @@
     ../modules/packages.nix
     ../modules/office-defaults.nix
     ../modules/hermes-client.nix
-    ../modules/whisper-flow.nix
+    ../modules/ollama.nix
     ../modules/alt-codes.nix
     ../modules/claude-desktop.nix
     ../modules/auto-upgrade.nix
@@ -49,7 +49,7 @@
     # "i2c" lets KDE set external-monitor brightness over DDC/CI without
     # root (see hardware.i2c.enable in modules/desktop.nix).
     # "docker" is root-equivalent; needed to docker exec into Hermes.
-    # "ydotool" and "input" are added by modules/whisper-flow.nix.
+    # "input" and "uinput" are added by modules/alt-codes.nix.
     # "kvm" is for Claude Desktop Cowork (needs /dev/kvm + /dev/vhost-vsock).
     # Group membership only takes effect after a full logout/reboot.
     extraGroups = [ "networkmanager" "wheel" "audio" "i2c" "docker" "kvm" ];

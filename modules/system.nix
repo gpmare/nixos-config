@@ -146,7 +146,7 @@
   nix.settings.auto-optimise-store = true;
 
   # ============================================================
-  #  Allow unfree packages (VSCode, Reaper, Brave, etc.)
+  #  Allow unfree packages (VSCode, Reaper, Brave Origin, etc.)
   # ============================================================
   nixpkgs.config.allowUnfree = true;
 

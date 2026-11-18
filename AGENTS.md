@@ -40,13 +40,13 @@ succeed on the first try**.
 | User identity, bash aliases, starship, git, mise, HM imports | `home-manager/gpmare.nix` |
 | Kitty theme / Plasma default terminal | `home-manager/kitty.nix` |
 | VS Code / Cursor / Neovim | `home-manager/vscode.nix`, `cursor.nix`, `neovim.nix` |
-| Brave web-app desktop entries (Calendar, WhatsApp, YT Music) | `home-manager/web-apps.nix` |
+| Chromium web-app desktop entries (Calendar, WhatsApp, YT Music) | `home-manager/web-apps.nix` |
 | External-monitor brightness fix (user-level) | `home-manager/brightness.nix` |
 | Package **not** in nixpkgs (AppImage, local drv) | `pkgs/<name>.nix` + `callPackage` from a module |
 | Hermes Agent gateway (Docker + local dashboard) — **nucbox only** | `modules/hermes.nix` (imported by `hosts/nucbox/configuration.nix`) |
 | Hermes desktop app + CLI (both hosts) | `modules/hermes-client.nix` + `pkgs/hermes-desktop.nix` |
 | Axiom's PostgreSQL 18 (both hosts; data per machine) | `modules/axiom.nix` |
-| Local voice dictation (whisper-flow) | `modules/whisper-flow.nix` + `home-manager/plasma.nix` |
+| Ollama (both hosts; nucbox overrides to ROCm) | `modules/ollama.nix` |
 | Claude Desktop (official Linux .deb) | `pkgs/claude-desktop.nix` + `modules/claude-desktop.nix` (`programs.claude-desktop.enable`) |
 | Grok Bot (official Linux .deb) | `pkgs/grok-bot.nix` via `callPackage` in `modules/packages.nix` |
 | Claude Code CLI | `pkgs/claude-code-manifest.json` override of `pkgs.claude-code` in `modules/packages.nix` |
@@ -71,7 +71,7 @@ flake.nix  (mkHost <hostname>)
   │         imports → hardware-configuration.nix, ../common.nix
   │
   │  hosts/common.nix imports → modules/{system,desktop,audio,dev,packages,hermes-client,
-  │                              whisper-flow,alt-codes,claude-desktop,auto-upgrade,axiom}.nix
+  │                              ollama,alt-codes,claude-desktop,auto-upgrade,axiom}.nix
   ├─ musnix, nix-index-database, plasma-manager, home-manager (external modules, both hosts)
   └─ home-manager.users.gpmare ← home-manager/gpmare.nix (both hosts)
        imports → neovim, vscode, cursor, brightness, kitty, web-apps, plasma, work-awake
@@ -145,7 +145,7 @@ Sources: [Nix flake Git behaviour](https://jvns.ca/blog/2023/11/11/notes-on-nix-
 | --- | --- |
 | New file under `modules/`, `home-manager/`, `pkgs/`, `hosts/` | `git add` it |
 | Package name unknown | `nix eval` / `nix search` against **this flake’s** pkgs |
-| Unfree app (VS Code, Brave, Reaper, …) | Already allowed (`nixpkgs.config.allowUnfree` in `system.nix`) |
+| Unfree app (VS Code, Brave Origin, Reaper, …) | Already allowed (`nixpkgs.config.allowUnfree` in `system.nix`) |
 | Local AppImage / binary package | Prefetch hash: `nix-prefetch-url --type sha256 <url>` then `nix hash convert --from nix32 --to sri --hash-algo sha256 <hash>`; put SRI in `hash = "sha256-…"` |
 | Hash wrong | Build once, paste the `got:` SRI Nix prints — do not guess |
 | `callPackage ./foo.nix` path | Relative to the **module file** that calls it, not the repo root (`packages.nix` → `../pkgs/…`) |
@@ -192,7 +192,7 @@ environment.systemPackages = with pkgs; [
 
 ### Web app with no good native client
 
-Add an `xdg.desktopEntries.*` entry in `home-manager/web-apps.nix` (Brave `--app=` pattern already used).
+Add an `xdg.desktopEntries.*` entry in `home-manager/web-apps.nix` (Chromium `--app=` pattern already used).
 
 ---
 
