@@ -47,5 +47,8 @@
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "battery-full" "echo Standard | sudo tee /sys/class/power_supply/BAT0/charge_types")
     (pkgs.writeShellScriptBin "battery-care" "sudo systemctl restart battery-charge-limit && cat /sys/class/power_supply/BAT0/charge_types")
+    # Impression: writes ISOs (e.g. Omarchy) to USB sticks; Linux-native
+    # alternative to balenaEtcher, which is no longer maintained in nixpkgs.
+    pkgs.impression
   ];
 }
