@@ -22,7 +22,11 @@
     ../modules/claude-desktop.nix
     ../modules/auto-upgrade.nix
     ../modules/axiom.nix
+    ../modules/tapeback.nix
   ];
+
+  # Meeting recorder (modules/tapeback.nix). Role per host: nucbox is the worker.
+  services.tapeback.enable = true;
 
   # Official Claude Desktop Linux .deb (pkgs/claude-desktop.nix).
   programs.claude-desktop.enable = true;

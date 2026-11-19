@@ -115,4 +115,11 @@
   users.users.gpmare.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMV3qDn/Id2r2S2sjLEJ1dWZR3d39duGmlpNx/7eLKno gpmare@dell"
   ];
+
+  # ============================================================
+  #  Meeting transcription worker (modules/tapeback.nix)
+  # ============================================================
+  # The nucbox does all the Whisper + pyannote work for both machines; the Dell
+  # only records and sends the audio here over Tailscale SSH (already allowed above).
+  services.tapeback.role = "worker";
 }
